@@ -19,12 +19,11 @@ namespace KeepPasswords.Controllers.Account
 
         public IActionResult Register()
         {
-            return PartialView();
+            return View();
         }
 
 
         [HttpPost]
-
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (ModelState.IsValid)
@@ -47,13 +46,25 @@ namespace KeepPasswords.Controllers.Account
                     }
                 }
             }
+
             return View(model);
         }
 
         [HttpGet]
         public IActionResult Login(string returnUrl = null)
         {
-            return PartialView(new LoginViewModel { ReturnUrl = returnUrl });
+            if(User.Identity.IsAuthenticated)
+            {
+                if(!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                {
+                    return Redirect(returnUrl);
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+            }
+            return View(new LoginViewModel { ReturnUrl = returnUrl });
         }
 
 
