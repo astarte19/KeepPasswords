@@ -1,4 +1,6 @@
-﻿using KeepPasswords.Models.Account;
+﻿using KeepPasswords.Data;
+using KeepPasswords.Models.Account;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Policy;
@@ -9,11 +11,13 @@ namespace KeepPasswords.Controllers.Account
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
+        private readonly ApplicationContext context;
 
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager)
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, ApplicationContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            this.context = context;
         }
         [HttpGet]
 
@@ -105,6 +109,91 @@ namespace KeepPasswords.Controllers.Account
             // удаляем аутентификационные куки
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
+        }
+
+        [Authorize]
+        public async Task<IActionResult> AccountSettings()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var avatar = context.UserAvatars.Where(x => x.UserId.Equals(user.Id)).FirstOrDefault().Avatar;
+            ViewBag.Avatar = avatar;
+            return View("AccountSettings", user);
+        }
+        [Authorize]
+        public async Task<IActionResult> SaveAccountChanges([Bind] ProfileData profile)
+        {
+            try
+            {
+                var user = await _userManager.GetUserAsync(User);                
+                user.UserName = profile.UserName;
+                user.Email = profile.Email;
+                await _userManager.UpdateAsync(user);
+
+                
+
+                return new EmptyResult();
+            }
+            catch (Exception ex)
+            {
+                return Content($"{ex.Message}");
+            }
+        }
+        [Authorize]
+        public async Task<IActionResult> UploadAvatar()
+        {
+            try
+            {
+                var Avatar = Request.Form.Files[0];
+                if (Avatar != null)
+                {
+                    var user = await _userManager.GetUserAsync(User);
+                    var currentAvatar = context.UserAvatars.Where(x => x.UserId.Equals(user.Id)).FirstOrDefault();
+                    if (currentAvatar != null)
+                    {
+                        context.UserAvatars.Remove(currentAvatar);
+                        await context.SaveChangesAsync();
+                    }
+
+                    byte[] imageData = null;
+
+                    using (var binaryReader = new BinaryReader(Avatar.OpenReadStream()))
+                    {
+                        imageData = binaryReader.ReadBytes((int)Avatar.Length);
+                    }
+                   
+                    UserAvatar userAvatar = new UserAvatar();
+                    userAvatar.UserId = user.Id;
+                    userAvatar.Avatar = imageData;
+                    context.UserAvatars.Add(userAvatar);
+                    await context.SaveChangesAsync();
+                    return new EmptyResult();
+                }
+                return Content("Аватар не был загружен!");
+            }
+            catch(Exception ex)
+            {
+                return Content(ex.Message);
+            }
+            
+        }
+
+        [Authorize]
+        public async Task<IActionResult> IsEmailFree(string email)
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            if(currentUser.Email.Equals(email))
+            {
+                return new EmptyResult();
+            }
+
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user != null)
+            {
+                return Content("Email занят");
+            }
+
+            return new EmptyResult();
         }
     }
 }

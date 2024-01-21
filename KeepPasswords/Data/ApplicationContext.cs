@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using KeepPasswords.Models.Account;
+using KeepPasswords.Models.PasswordsKeeper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ namespace KeepPasswords.Data
             Database.EnsureCreated();
         }
 
-        
+        public DbSet<UserSecretPhrase> UserSecretPhrases { get; set; }
+        public DbSet<UserAvatar> UserAvatars { get; set; }
     }
 }

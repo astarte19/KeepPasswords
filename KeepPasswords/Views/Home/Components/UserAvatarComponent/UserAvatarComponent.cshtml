@@ -1,0 +1,8 @@
+﻿@if (ViewBag.Avatar!=null)
+{
+    <span class="avatar avatar-sm" style="background-image: url(data:image/jpeg;base64,@(Convert.ToBase64String(ViewBag.Avatar)))"></span>
+}
+else
+{
+    <span class="avatar avatar-sm"></span>
+}

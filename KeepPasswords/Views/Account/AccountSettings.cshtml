@@ -1,0 +1,199 @@
+﻿@model KeepPasswords.Models.Account.User
+<div class="container-xl">
+    <input type="file" hidden id="avatart_fileForm" onchange="onShowPreview(event);" accept="image/png, image/jpeg" />
+    <div class="card">
+        <div class="row g-0">
+            <div class="col-12 col-md-3 border-end">
+                <div class="card-body">
+                    <h4 class="subheader">Настройки учетной записи</h4>
+                    <div class="list-group list-group-transparent">
+                        <a href="./settings.html" class="list-group-item list-group-item-action d-flex align-items-center active">Учетная запись</a>
+                        <a title="В процессе разработки" class="list-group-item list-group-item-action d-flex align-items-center disabled">Мои уведомления</a>
+                        <a title="В процессе разработки" class="list-group-item list-group-item-action d-flex align-items-center disabled">Стронние сервисы</a>
+                    </div>
+                    <h4 class="subheader mt-4">Поддержка</h4>
+                    <div class="list-group list-group-transparent">
+                        <a title="В процессе разработки" class="list-group-item list-group-item-action disabled">Обратная связь</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-9 d-flex flex-column">
+                <div class="card-body">
+                    <h2 class="mb-4">Учетная запись</h2>
+                    <h3 class="card-title">Профиль</h3>
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            @if (ViewBag.Avatar!=null)
+                            {
+                                <span id="avatar_container" class="avatar avatar-xl" style="background-image: url(data:image/jpeg;base64,@(Convert.ToBase64String(ViewBag.Avatar)))"></span>
+                            }
+                            else
+                            {
+                                <span id="avatar_container" class="avatar avatar-xl"></span>
+                            }
+
+                        </div>
+                        <div class="col-auto">
+                            <a onclick="document.getElementById('avatart_fileForm').click();" class="btn">
+                                Сменить аватар
+                            </a>
+                        </div>
+                        <div class="col-auto">
+                            <a href="#" class="btn btn-ghost-danger">
+                                Удалить аватар
+                            </a>
+                        </div>
+                    </div>
+                    <h3 class="card-title mt-4">Данные</h3>
+                    <div class="row g-3">
+                        <div class="col-md">
+                            <div class="form-label">Имя пользователя</div>
+                            <input type="text" class="form-control" value="@Model.UserName" id="userName">
+                        </div>
+                        <div class="col-md">
+                            <div class="form-label">Email</div>
+                            <input type="email" class="form-control" value="@Model.Email" id="Email">
+                        </div>
+                        <div class="col-md">
+                            <div class="form-label">Локация</div>
+                            <input type="text" class="form-control"
+                                   value="Peimei, China">
+                        </div>
+                    </div>
+                    <h3 class="card-title mt-4">SecretPhrase</h3>
+                    <p class="card-subtitle">Ключ, используемый для шифрования ваших данных.</p>
+                    <div>
+                        <div class="row g-2">
+                            <div class="col-auto">
+                                <input type="text" class="form-control w-auto" value="************">
+                            </div>
+                            <div class="col-auto">
+                                <a href="#" class="btn">
+                                    Сменить
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <h3 class="card-title mt-4">Пароль</h3>
+                    <p class="card-subtitle">Смена пароля доступна 1 раз в 7 дней.</p>
+                    <div>
+                        <a href="#" class="btn">
+                            Установить новый пароль
+                        </a>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent mt-auto">
+                    <div class="btn-list justify-content-end">
+                        <a asp-controller="Home" asp-action="Index" class="btn">
+                            Отмена
+                        </a>
+                        <a onclick="onSaveAccountChanges();" class="btn btn-primary">
+                            Сохранить изменения
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function onShowPreview(event) {
+        var src = URL.createObjectURL(event.target.files[0]);
+        var avatar_container = document.getElementById('avatar_container');
+        avatar_container.style.backgroundImage = 'url(' + src + ')';
+    }
+
+    function onSaveAccountChanges() {
+        var ValidFields = true;
+
+        var UserName = document.getElementById('userName').value;
+        if (UserName == null || UserName == '' || UserName.length < 5) {
+            ValidFields = false;
+            AlertValidate('Имя пользователя должно иметь более 5 символов!');
+        }
+
+        var Email = document.getElementById('Email').value;
+
+        if (ValidFields) {
+
+            if (Email != null || Email != '') {
+                let pattern = /^[^ ]+@@[^ ]+\.[a-z]{2,3}$/;
+                if (!Email.match(pattern)) {
+                    ValidFields = false;
+                    AlertValidate('Email введен некорректно!');
+                }
+                else {
+                    $.get('@Url.Action("IsEmailFree", "Account")', { email: Email }, function (data) {
+                        if (data != null && data != '') {
+                            ValidFields = false;
+                            AlertValidate('Данный Email занят!');
+                        }
+                    });
+                }
+            }
+            else {
+                ValidFields = false;
+                AlertValidate('Email не должен быть пустым!');
+            }
+        }
+
+        if (ValidFields) {
+            var model = {};
+            model["UserName"] = UserName;
+            model["Email"] = Email;
+            var fileform = document.getElementById('avatart_fileForm');
+            if (fileform.files.length > 0) {
+                var avatar = fileform.files[0];
+                var data = new FormData();
+                data.append("file", avatar);
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("UploadAvatar","Account")',
+                    contentType:false,
+                    processData:false,
+                    data: data,
+                    success: function (data) {
+                        if (data != null && data != '') {
+                            AlertValidate(data);
+                        }
+                        
+                    },
+                    error: function () {
+                        AlertValidate(xhr.respomseText);
+                    }
+                });
+            }
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("SaveAccountChanges","Account")',               
+                data: { profile: model },
+                success: function (data) {
+                    if (data != null && data != '')
+                    {
+                        AlertValidate(data);
+                    }
+                    AlertSuccess('Выполнено успешно');
+                },
+                error: function () {
+                    AlertValidate(xhr.respomseText);
+                }
+            });
+        }
+    }
+
+    function AlertValidate(message) {
+        $.get('@Url.Action("ShowModalError", "Home")', { message: message }, function (data) {
+            $('#modal_body').html(data);
+            globalOpenModal();
+        });
+
+    }
+    function AlertSuccess(message) {
+        $.get('@Url.Action("ShowModalSuccess", "Home")', { message: message }, function (data) {
+            $('#modal_body').html(data);
+            globalOpenModal();
+        });
+
+    }
+</script>
