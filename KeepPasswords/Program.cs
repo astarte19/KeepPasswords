@@ -19,7 +19,7 @@ builder.Services.AddIdentity<User, IdentityRole>(
         opts.Password.RequireDigit = false;
         opts.User.RequireUniqueEmail = true;
     }
-    )
+    ).AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<ApplicationContext>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();

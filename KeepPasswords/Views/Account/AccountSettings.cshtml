@@ -77,7 +77,7 @@
                     <h3 class="card-title mt-4">Пароль</h3>
                     <p class="card-subtitle">Смена пароля доступна 1 раз в 7 дней.</p>
                     <div>
-                        <a href="#" class="btn">
+                        <a onclick="ShowModalPasswordChange()" class="btn">
                             Установить новый пароль
                         </a>
                     </div>
@@ -202,5 +202,64 @@
             
            
         });
+    }
+
+    function ShowModalPasswordChange() {
+        $.get('@Url.Action("ShowModalResetPassword", "Account")', null, function (data) {
+            $('#modal_body').html(data);
+            globalOpenModal();
+        });
+    }
+
+    function onChangeUserPassword()
+    {
+        var ValidField = true;
+        var Password = document.getElementById('password').value;
+        var PasswordConfirmation = document.getElementById('password_confirmation').value;
+
+        if (Password == null || Password == '') 
+        {
+            ValidField = false;
+            AlertValidate('Новый пароль не должен быть пустым!');
+        }
+
+        if (ValidField)
+        {
+            if (PasswordConfirmation == null || PasswordConfirmation == '') {
+                ValidField = false;
+                AlertValidate('Подтверждение пароля не долженл быть пустым!');
+            }
+        }
+
+        if (ValidField)
+        {
+            if (Password.length < 5) {
+                ValidField = false;
+                AlertValidate('Минимальная длина пароля 5 символов!');
+            }
+        }
+
+        if (ValidField)
+        {
+            if (Password != PasswordConfirmation) {
+                ValidField = false;
+                AlertValidate('Пароль и подтверждение пароля не совпадают!');
+            }
+        }
+        
+
+        if (ValidField)
+        {
+            $.get('@Url.Action("ChangeUserPassword", "Account")', { Password: Password }, function (data) {
+                if (data != null && data != '') {
+                    AlertValidate(data);
+                }
+                else {
+                    AlertSuccess('Выполнено успешно');
+                }
+
+
+            });
+        }
     }
 </script>

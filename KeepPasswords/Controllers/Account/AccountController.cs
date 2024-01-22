@@ -227,5 +227,27 @@ namespace KeepPasswords.Controllers.Account
                 return Content(ex.Message);
             }
         }
+
+        [Authorize]
+        public async Task<IActionResult> ShowModalResetPassword()
+        {
+            return PartialView("ModalResetPassword");
+        }
+
+        [Authorize]
+        public async Task<IActionResult> ChangeUserPassword(string Password)
+        {
+            try
+            {                
+                var user = await _userManager.FindByNameAsync(User.Identity.Name);
+                var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var result = await _userManager.ResetPasswordAsync(user, code, Password);
+                return new EmptyResult();
+            }
+            catch (Exception ex)
+            {
+                return Content(ex.Message);
+            }
+        }
     }
 }
