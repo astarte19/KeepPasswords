@@ -18,12 +18,12 @@
                 {
                     <div class="btn-list">
 
-                        <a class="btn btn-primary d-none d-sm-inline-block" onclick="onShowModalCreatePassword()">
+                        <a class="btn btn-dark d-none d-sm-inline-block" onclick="onShowModalCreatePassword()">
                             <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
                             Новый пароль
                         </a>
-                        <a class="btn btn-primary d-sm-none btn-icon" aria-label="Добавить новый пароль" onclick="onShowModalCreatePassword()">
+                        <a class="btn btn-dark d-sm-none btn-icon" aria-label="Добавить новый пароль" onclick="onShowModalCreatePassword()">
                             <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
                         </a>
@@ -33,12 +33,12 @@
                 {
                     <div class="btn-list" style="cursor: pointer !important;" title="Для пользователя не установлен SecretPhrase! Необходимо добавить его в настройках!">
 
-                        <a class="btn btn-primary d-none d-sm-inline-block disabled">
+                        <a class="btn btn-dark d-none d-sm-inline-block disabled">
                             <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
                             Новый пароль
                         </a>
-                        <a class="btn btn-primary d-sm-none btn-icon disabled">
+                        <a class="btn btn-dark d-sm-none btn-icon disabled">
                             <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
                         </a>
@@ -58,8 +58,10 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
+        showSpinner();
         $.get('@Url.Action("GetPasswords", "PasswordsKeeper")', null, function (data) {
             $('#table_container').html(data);
+            hideSpinner();
         });
     });
 

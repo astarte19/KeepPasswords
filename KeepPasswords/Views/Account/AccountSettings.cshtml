@@ -114,7 +114,7 @@
                         <a asp-controller="Home" asp-action="Index" class="btn">
                             Отмена
                         </a>
-                        <a onclick="onSaveAccountChanges();" class="btn btn-primary">
+                        <a onclick="onSaveAccountChanges();" class="btn btn-dark">
                             Сохранить изменения
                         </a>
                     </div>
@@ -131,11 +131,13 @@
     }
 
     function onSaveAccountChanges() {
+        showSpinner();
         var ValidFields = true;
 
         var UserName = document.getElementById('userName').value;
         if (UserName == null || UserName == '' || UserName.length < 5) {
             ValidFields = false;
+            hideSpinner();
             AlertValidate('Имя пользователя должно иметь более 5 символов!');
         }
         var Location = document.getElementById('LocationForm').value;
@@ -147,11 +149,13 @@
                 let pattern = /^[^ ]+@@[^ ]+\.[a-z]{2,3}$/;
                 if (!Email.match(pattern)) {
                     ValidFields = false;
+                    hideSpinner();
                     AlertValidate('Email введен некорректно!');
                 }
                 else {
                     $.get('@Url.Action("IsEmailFree", "Account")', { email: Email }, function (data) {
                         if (data != null && data != '') {
+                            hideSpinner();
                             ValidFields = false;
                             AlertValidate('Данный Email занят!');
                         }
@@ -159,6 +163,7 @@
                 }
             }
             else {
+                hideSpinner();
                 ValidFields = false;
                 AlertValidate('Email не должен быть пустым!');
             }
@@ -182,11 +187,13 @@
                     data: data,
                     success: function (data) {
                         if (data != null && data != '') {
+                            hideSpinner();
                             AlertValidate(data);
                         }
                         
                     },
                     error: function () {
+                        hideSpinner();
                         AlertValidate(xhr.respomseText);
                     }
                 });
@@ -199,11 +206,14 @@
                 success: function (data) {
                     if (data != null && data != '')
                     {
+                        hideSpinner();
                         AlertValidate(data);
                     }
+                    hideSpinner();
                     AlertSuccess('Выполнено успешно');
                 },
                 error: function () {
+                    hideSpinner();
                     AlertValidate(xhr.respomseText);
                 }
             });

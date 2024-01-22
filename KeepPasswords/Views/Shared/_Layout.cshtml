@@ -178,6 +178,20 @@
             });
 
         }
+
+        function showSpinner()
+        {
+            $.get('@Url.Action("ShowSpinner", "Home")', null, function (data) {
+                $('#modal_body').html(data);
+                globalOpenModal();
+            });
+        }
+
+        function hideSpinner()
+        {
+            $('#modal_body').html('');
+            globalCloseModal()
+        }
     </script>
 </body>
 </html>

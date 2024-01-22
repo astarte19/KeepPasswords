@@ -42,6 +42,10 @@ namespace KeepPasswords.Controllers
         {
             return PartialView("ModalSuccess", message);
         }
+        public async Task<IActionResult> ShowSpinner()
+        {
+            return PartialView("ModalSpinner");
+        }
     }
 
     public class UserAvatarComponent: ViewComponent

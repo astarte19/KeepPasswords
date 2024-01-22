@@ -19,5 +19,6 @@ namespace KeepPasswords.Data
 
         public DbSet<UserSecretPhrase> UserSecretPhrases { get; set; }
         public DbSet<UserAvatar> UserAvatars { get; set; }
+        public DbSet<PasswordItem> UserPasswordManager { get; set; }
     }
 }
