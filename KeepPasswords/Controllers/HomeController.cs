@@ -58,8 +58,15 @@ namespace KeepPasswords.Controllers
         public async Task<IViewComponentResult> InvokeAsync()
         {
             var user = await _userManager.FindByNameAsync(User.Identity.Name);
-            var avatar = applicationContext.UserAvatars.Where(x => x.UserId.Equals(user.Id)).FirstOrDefault().Avatar;
-            ViewBag.Avatar = avatar;
+            var avatar = applicationContext.UserAvatars.Where(x => x.UserId.Equals(user.Id)).FirstOrDefault();
+            if (avatar != null)
+            {
+                ViewBag.Avatar = avatar.Avatar;
+            }
+            else
+            {
+                ViewBag.Avatar = null;
+            }
             return View("~/Views/Home/Components/UserAvatarComponent/UserAvatarComponent.cshtml");
 
         }

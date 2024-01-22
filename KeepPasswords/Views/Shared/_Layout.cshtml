@@ -163,6 +163,21 @@
             $('#modal_body').show();
             $("#modal_body").addClass("show");
         }
+
+        function AlertValidate(message) {
+            $.get('@Url.Action("ShowModalError", "Home")', { message: message }, function (data) {
+                $('#modal_body').html(data);
+                globalOpenModal();
+            });
+
+        }
+        function AlertSuccess(message) {
+            $.get('@Url.Action("ShowModalSuccess", "Home")', { message: message }, function (data) {
+                $('#modal_body').html(data);
+                globalOpenModal();
+            });
+
+        }
     </script>
 </body>
 </html>

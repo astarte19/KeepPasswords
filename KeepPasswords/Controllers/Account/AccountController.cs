@@ -115,8 +115,16 @@ namespace KeepPasswords.Controllers.Account
         public async Task<IActionResult> AccountSettings()
         {
             var user = await _userManager.GetUserAsync(User);
-            var avatar = context.UserAvatars.Where(x => x.UserId.Equals(user.Id)).FirstOrDefault().Avatar;
-            ViewBag.Avatar = avatar;
+            var avatar = context.UserAvatars.Where(x => x.UserId.Equals(user.Id)).FirstOrDefault();
+            if (avatar != null)
+            {
+                ViewBag.Avatar = avatar.Avatar;
+            }
+            else
+            {
+                ViewBag.Avatar = null;
+            }
+            
             return View("AccountSettings", user);
         }
         [Authorize]
@@ -194,6 +202,30 @@ namespace KeepPasswords.Controllers.Account
             }
 
             return new EmptyResult();
+        }
+        [Authorize]
+        public async Task<IActionResult> ShowModalResetAvatarConfirmation()
+        {
+            return PartialView("ModalResetAvatarConfirmation");
+        }
+        [Authorize]
+        public async Task<IActionResult> ResetAvatar()
+        {
+            try
+            {
+                var currentUser = await _userManager.GetUserAsync(User);
+                var avatar = context.UserAvatars.Where(x=>x.UserId.Equals(currentUser.Id)).FirstOrDefault();
+                if (avatar != null)
+                {
+                    context.UserAvatars.Remove(avatar);
+                    await context.SaveChangesAsync();
+                }
+                return new EmptyResult();
+            }
+            catch(Exception ex)
+            {
+                return Content(ex.Message);
+            }
         }
     }
 }

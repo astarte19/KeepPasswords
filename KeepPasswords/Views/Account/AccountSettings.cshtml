@@ -39,7 +39,7 @@
                             </a>
                         </div>
                         <div class="col-auto">
-                            <a href="#" class="btn btn-ghost-danger">
+                            <a onclick="ResetAvatarConfirmation()" class="btn btn-ghost-danger">
                                 Удалить аватар
                             </a>
                         </div>
@@ -182,18 +182,25 @@
         }
     }
 
-    function AlertValidate(message) {
-        $.get('@Url.Action("ShowModalError", "Home")', { message: message }, function (data) {
+    function ResetAvatarConfirmation()
+    {
+        $.get('@Url.Action("ShowModalResetAvatarConfirmation", "Account")', null, function (data) {
             $('#modal_body').html(data);
             globalOpenModal();
         });
-
     }
-    function AlertSuccess(message) {
-        $.get('@Url.Action("ShowModalSuccess", "Home")', { message: message }, function (data) {
-            $('#modal_body').html(data);
-            globalOpenModal();
+    function ResetAvatar() {
+        $.get('@Url.Action("ResetAvatar", "Account")', null, function (data) {
+            if(data!=null && data!='')
+            {
+                AlertValidate(data);
+            }
+            else{
+                globalCloseModal();
+                window.location.href = '@Url.Action("AccountSettings", "Account")';
+            }
+            
+           
         });
-
     }
 </script>
