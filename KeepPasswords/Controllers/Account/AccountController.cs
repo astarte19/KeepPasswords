@@ -1,4 +1,5 @@
 ﻿using KeepPasswords.Data;
+using KeepPasswords.Models.PasswordsKeeper;
 using KeepPasswords.Models.Account;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -124,7 +125,16 @@ namespace KeepPasswords.Controllers.Account
             {
                 ViewBag.Avatar = null;
             }
-            
+            var secretKey = context.UserSecretPhrases.Where(x=>x.UserId.Equals(user.Id)).FirstOrDefault();
+            if(secretKey != null)
+            {
+                ViewBag.SecretKey = secretKey.SecretPhrase;
+            }
+            else
+            {
+                ViewBag.SecretKey = null;
+            }
+
             return View("AccountSettings", user);
         }
         [Authorize]
@@ -135,6 +145,7 @@ namespace KeepPasswords.Controllers.Account
                 var user = await _userManager.GetUserAsync(User);                
                 user.UserName = profile.UserName;
                 user.Email = profile.Email;
+                user.Location = profile.Location;
                 await _userManager.UpdateAsync(user);
 
                 
@@ -242,6 +253,39 @@ namespace KeepPasswords.Controllers.Account
                 var user = await _userManager.FindByNameAsync(User.Identity.Name);
                 var code = await _userManager.GeneratePasswordResetTokenAsync(user);
                 var result = await _userManager.ResetPasswordAsync(user, code, Password);
+                return new EmptyResult();
+            }
+            catch (Exception ex)
+            {
+                return Content(ex.Message);
+            }
+        }
+
+        [Authorize]
+        public async Task<IActionResult> ShowModalSecretKey()
+        {
+            return PartialView("ModalSecretKey");
+        }
+
+        [Authorize] 
+        public async Task<IActionResult> AddUpdateSecretPhrase(string SecretPhrase)
+        {
+            try
+            {
+                var user = await _userManager.FindByNameAsync(User.Identity.Name);
+                var secretKey = context.UserSecretPhrases.Where(x => x.UserId.Equals(user.Id)).FirstOrDefault();
+                if(secretKey != null)
+                {
+                    secretKey.SecretPhrase = SecretPhrase;
+                }
+                else
+                {
+                    UserSecretPhrase userSecretPhrase = new UserSecretPhrase();
+                    userSecretPhrase.UserId = user.Id;
+                    userSecretPhrase.SecretPhrase = SecretPhrase;
+                    await context.UserSecretPhrases.AddAsync(userSecretPhrase);
+                }
+                await context.SaveChangesAsync();
                 return new EmptyResult();
             }
             catch (Exception ex)

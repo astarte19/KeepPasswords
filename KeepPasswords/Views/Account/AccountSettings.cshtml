@@ -57,25 +57,52 @@
                         <div class="col-md">
                             <div class="form-label">Локация</div>
                             <input type="text" class="form-control"
-                                   value="Peimei, China">
+                                   value="@Model.Location" id="LocationForm">
                         </div>
                     </div>
                     <h3 class="card-title mt-4">SecretPhrase</h3>
                     <p class="card-subtitle">Ключ, используемый для шифрования ваших данных.</p>
                     <div>
-                        <div class="row g-2">
-                            <div class="col-auto">
-                                <input type="text" class="form-control w-auto" value="************">
+                        @if (ViewBag.SecretKey==null)
+                        {
+                            <div class="row g-2">
+                                <div class="col-auto">
+                                    <input type="password" class="form-control w-auto" value="**********" disabled>
+                                </div>
+                                <div class="col-auto">
+                                    <a class="btn disabled">
+                                        Показать
+                                    </a>
+                                </div>
+                                <div class="col-auto">
+                                    <a onclick="ShowModalSecretKey()" class="btn">
+                                        Установить
+                                    </a>
+                                </div>
                             </div>
-                            <div class="col-auto">
-                                <a href="#" class="btn">
-                                    Сменить
-                                </a>
+                        }
+                        else
+                        {
+                            <div class="row g-2">
+                                <div class="col-auto">
+                                    <input type="password" class="form-control w-auto" value="@ViewBag.SecretKey" id="notEmptySecretKey">
+                                </div>
+                                <div class="col-auto">
+                                    <a onclick="onToggleInput('notEmptySecretKey');" class="btn" id="notEmptySecretKey_button">
+                                        Показать
+                                    </a>
+                                </div>
+                                <div class="col-auto">
+                                    <a onclick="ShowModalSecretKey()" class="btn">
+                                        Сменить
+                                    </a>
+                                </div>
                             </div>
-                        </div>
+                        }
+                       
                     </div>
                     <h3 class="card-title mt-4">Пароль</h3>
-                    <p class="card-subtitle">Смена пароля доступна 1 раз в 7 дней.</p>
+                    <p class="card-subtitle">Не менее 5 символов.</p>
                     <div>
                         <a onclick="ShowModalPasswordChange()" class="btn">
                             Установить новый пароль
@@ -111,7 +138,7 @@
             ValidFields = false;
             AlertValidate('Имя пользователя должно иметь более 5 символов!');
         }
-
+        var Location = document.getElementById('LocationForm').value;
         var Email = document.getElementById('Email').value;
 
         if (ValidFields) {
@@ -141,6 +168,7 @@
             var model = {};
             model["UserName"] = UserName;
             model["Email"] = Email;
+            model["Location"] = Location;
             var fileform = document.getElementById('avatart_fileForm');
             if (fileform.files.length > 0) {
                 var avatar = fileform.files[0];
@@ -256,6 +284,83 @@
                 }
                 else {
                     AlertSuccess('Выполнено успешно');
+                }
+
+
+            });
+        }         
+    }
+    
+    function onToggleInput(id)
+    {
+        var input = document.getElementById(id);
+        if(input.type == 'password')
+        {
+            if (id == 'notEmptySecretKey')
+            {
+                var btn = document.getElementById('notEmptySecretKey_button');
+                btn.innerText = 'Скрыть';
+            }
+            input.type = 'text';
+        }
+        else
+        {
+            if (id == 'notEmptySecretKey') {
+                var btn = document.getElementById('notEmptySecretKey_button');
+                btn.innerText = 'Показать';
+            }
+            input.type = 'password';
+        }
+    }
+
+    function ShowModalSecretKey() {
+        $.get('@Url.Action("ShowModalSecretKey", "Account")', null, function (data) {
+            $('#modal_body').html(data);
+            globalOpenModal();
+        });
+    }
+
+
+    function onAddUpdateSecretPhrase() {
+        var ValidField = true;
+        var SecretKey = document.getElementById('secretPhrase').value;
+        var SecretKeyConfirmation = document.getElementById('secretPhrase_confirmation').value;
+
+        if (SecretKey == null || SecretKey == '') {
+            ValidField = false;
+            AlertValidate('Secret Phrase не должен быть пустым!');
+        }
+
+        if (ValidField) {
+            if (SecretKeyConfirmation == null || SecretKeyConfirmation == '') {
+                ValidField = false;
+                AlertValidate('Подтверждение не долженo быть пустым!');
+            }
+        }
+
+        if (ValidField) {
+            if (SecretKey.length < 5) {
+                ValidField = false;
+                AlertValidate('Минимальная длина Secret Phrase 5 символов!');
+            }
+        }
+
+        if (ValidField) {
+            if (SecretKey != SecretKeyConfirmation) {
+                ValidField = false;
+                AlertValidate('Secret Phrase и подтверждение пароля не совпадают!');
+            }
+        }
+
+
+        if (ValidField) {
+            $.get('@Url.Action("AddUpdateSecretPhrase", "Account")', { SecretPhrase: SecretKey }, function (data) {
+                if (data != null && data != '') {
+                    AlertValidate(data);
+                }
+                else {
+                    globalCloseModal();
+                    window.location.href = '@Url.Action("AccountSettings", "Account")';
                 }
 
 
