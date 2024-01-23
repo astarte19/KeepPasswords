@@ -15,6 +15,7 @@ namespace KeepPasswords.Models.PasswordsKeeper
         public string Password { get; set; }
         public string? Email { get; set; }
         public DateTime RecentDateChange { get; set; }
+        public string? Additional { get; set; }
         [NotMapped]
         public string? IconURL { get; set; }
 

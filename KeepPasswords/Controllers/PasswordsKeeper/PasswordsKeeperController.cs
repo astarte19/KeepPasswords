@@ -1,6 +1,7 @@
 ﻿using HtmlAgilityPack;
 using KeepPasswords.Data;
 using KeepPasswords.Models.Account;
+using KeepPasswords.Models.PasswordsKeeper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -43,7 +44,16 @@ namespace KeepPasswords.Controllers.PasswordsKeeper
 
         public async Task<IActionResult> ShowModalCreateNewPassword()
         {
-            return PartialView("ModalCreatePassword");
+            PasswordItem model = new PasswordItem();
+            model.ItemId = 0;
+            return PartialView("ModalAddUpdatePassword", model);
+        }
+
+        public async Task<IActionResult> ShowModalUpdatePassword(int ItemId)
+        {
+            var user = await userManager.GetUserAsync(User);
+            var model = context.UserPasswordManager.Where(x => x.ItemId == ItemId && x.UserId.Equals(user.Id)).FirstOrDefault();
+            return PartialView("ModalAddUpdatePassword", model);
         }
 
         static string GetWebsiteIconUrl(HtmlDocument document, string websiteUrl)
@@ -67,6 +77,45 @@ namespace KeepPasswords.Controllers.PasswordsKeeper
 
             // Если иконка не найдена, возвращаем ссылку на стандартную иконку
             return ""; // замените на нужный URL
+        }
+
+        public async Task<IActionResult> AddUpdateService([Bind] PasswordItem model)
+        {
+            try
+            {
+                var user = await userManager.GetUserAsync(User);
+                model.UserId = user.Id;
+                model.RecentDateChange = DateTime.Now;
+                if (model.ItemId != 0)
+                {
+                    var existedModel = context.UserPasswordManager.Where(x => x.ItemId == model.ItemId && x.UserId.Equals(model.UserId)).FirstOrDefault();
+                    if(existedModel == null)
+                    {
+                        return Content("Возникла ошибка при обновлении сервиса!");
+                    }
+                    else
+                    {
+                        existedModel.RecentDateChange = DateTime.Now;
+                        existedModel.WebSite = model.WebSite;
+                        existedModel.ServiceName = model.ServiceName;
+                        existedModel.UserName = model.UserName;
+                        existedModel.Password = model.Password;
+                        existedModel.Email = model.Email;
+                        existedModel.Additional = model.Additional;
+                        context.UserPasswordManager.Update(existedModel);
+                    }
+                }
+                else
+                {                    
+                    await context.UserPasswordManager.AddAsync(model);
+                }
+                await context.SaveChangesAsync();
+                return new EmptyResult();
+            }
+            catch(Exception ex)
+            {
+                return Content(ex.Message);
+            }
         }
     }
 }

@@ -192,6 +192,24 @@
             $('#modal_body').html('');
             globalCloseModal()
         }
+
+        function onToggleInput(id) {
+            var input = document.getElementById(id);
+            if (input.type == 'password') {
+                if (id == 'notEmptySecretKey') {
+                    var btn = document.getElementById('notEmptySecretKey_button');
+                    btn.innerText = 'Скрыть';
+                }
+                input.type = 'text';
+            }
+            else {
+                if (id == 'notEmptySecretKey') {
+                    var btn = document.getElementById('notEmptySecretKey_button');
+                    btn.innerText = 'Показать';
+                }
+                input.type = 'password';
+            }
+        }
     </script>
 </body>
 </html>
