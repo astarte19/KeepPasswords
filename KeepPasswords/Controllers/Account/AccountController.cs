@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Policy;
+using KeepPasswords.Models;
 
 namespace KeepPasswords.Controllers.Account
 {
@@ -274,9 +275,17 @@ namespace KeepPasswords.Controllers.Account
             {
                 var user = await _userManager.FindByNameAsync(User.Identity.Name);
                 var secretKey = context.UserSecretPhrases.Where(x => x.UserId.Equals(user.Id)).FirstOrDefault();
+
+                if(String.IsNullOrEmpty(SecretPhrase) || SecretPhrase.Length != 16)
+                {
+                    return Content("Secret Phrase должен иметь длину 16 символов!");
+                }
+
                 if(secretKey != null)
                 {
+                    await ChangePasswordManagerUserDataCipher(secretKey.SecretPhrase,SecretPhrase);
                     secretKey.SecretPhrase = SecretPhrase;
+                    context.UserSecretPhrases.Update(secretKey);                    
                 }
                 else
                 {
@@ -292,6 +301,21 @@ namespace KeepPasswords.Controllers.Account
             {
                 return Content(ex.Message);
             }
+        }
+
+        public async Task ChangePasswordManagerUserDataCipher(string oldSecretKey,string newSecretKey)
+        {
+            var user = await _userManager.FindByNameAsync(User.Identity.Name);
+            var userPasswordManager = context.UserPasswordManager.Where(x => x.UserId.Equals(user.Id));
+            foreach(var item in userPasswordManager)
+            {
+                string decryptedPassword = EncryptorDecryptor.DecryptToPlainText(oldSecretKey, item.Password);
+                string encryptedPassword = EncryptorDecryptor.EncryptPlainText(newSecretKey, decryptedPassword);
+                item.Password = encryptedPassword;
+            }
+            context.UserPasswordManager.UpdateRange(userPasswordManager);
+            await context.SaveChangesAsync();
+
         }
     }
 }

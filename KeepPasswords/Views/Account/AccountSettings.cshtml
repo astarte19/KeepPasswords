@@ -85,7 +85,7 @@
                         {
                             <div class="row g-2">
                                 <div class="col-auto">
-                                    <input type="password" class="form-control w-auto" value="@ViewBag.SecretKey" id="notEmptySecretKey">
+                                    <input type="password" class="form-control w-auto" value="@ViewBag.SecretKey" id="notEmptySecretKey" disabled>
                                 </div>
                                 <div class="col-auto">
                                     <a onclick="onToggleInput('notEmptySecretKey');" class="btn" id="notEmptySecretKey_button">
@@ -329,16 +329,16 @@
         }
 
         if (ValidField) {
-            if (SecretKey.length < 5) {
+            if (SecretKey.length != 16) {
                 ValidField = false;
-                AlertValidate('Минимальная длина Secret Phrase 5 символов!');
+                AlertValidate('Длина Secret Phrase должна быть 16 символов!');
             }
         }
 
         if (ValidField) {
             if (SecretKey != SecretKeyConfirmation) {
                 ValidField = false;
-                AlertValidate('Secret Phrase и подтверждение пароля не совпадают!');
+                AlertValidate('Secret Phrase и подтверждение не совпадают!');
             }
         }
 

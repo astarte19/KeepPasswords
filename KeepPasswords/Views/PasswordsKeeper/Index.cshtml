@@ -189,4 +189,34 @@
         }
         
     }
+
+    
+    function onSearch() {        
+        var input = document.getElementById('serviceNameSearchInput');
+        var filter = input.value.toUpperCase();       
+        var lis = document.getElementsByClassName('serviceName');
+
+        var regPhrase = new RegExp(input.value, 'i');        
+        var flag = false;       
+
+        for (var i = 0; i < lis.length; i++) {            
+            flag = false;
+            
+            for (var j = lis.length - 1; j >= 0; j--) {                
+                flag = regPhrase.test(lis[i].innerHTML);              
+                if (flag) break;                
+            }
+            
+            if (flag) 
+            {                
+                var parentNode = lis[i].parentNode;                
+                parentNode.parentNode.parentNode.style.display = 'flex';
+            } 
+            else 
+            {                
+                var parentNode = lis[i].parentNode;                
+                parentNode.parentNode.parentNode.style.display = 'none';
+            }           
+        }        
+    }
 </script>
