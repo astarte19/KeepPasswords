@@ -1,0 +1,120 @@
+﻿<script src="~/css/dist/libs/tinymce/tinymce.js" defer></script>
+<!-- Page header -->
+<div class="page-header d-print-none">
+    <div class="container-xl">
+        <div class="row g-2 align-items-center">
+            <div class="col">
+                <!-- Page pre-title -->
+                <div class="page-pretitle">
+                    Обзор
+                </div>
+                <h2 class="page-title">
+                    Менеджер текстовых записей
+                </h2>
+            </div>
+            <!-- Page title actions -->
+            <div class="col-auto ms-auto d-print-none">
+                @if ((bool)ViewBag.HasSecretPhrase)
+                {
+                    <div class="btn-list">
+
+                        <a class="btn btn-dark d-none d-sm-inline-block" onclick="onCreateNewNote()">
+                            <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
+                            Новая запись
+                        </a>
+                        <a class="btn btn-dark d-sm-none btn-icon" aria-label="Добавить новый сервис" onclick="onCreateNewNote()">
+                            <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="btn-list" style="cursor: pointer !important;" title="Для пользователя не установлен SecretPhrase! Необходимо добавить его в настройках!">
+
+                        <a class="btn btn-dark d-none d-sm-inline-block disabled">
+                            <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
+                            Новая запись
+                        </a>
+                        <a class="btn btn-dark d-sm-none btn-icon disabled">
+                            <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
+                        </a>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Page body -->
+<div class="page-body">
+    <div class="container-xl">
+     
+            <div class="row g-0">
+                <div class="col-12 col-md-3 border-end">
+                  
+                        <!--Sample-->
+                    <div class="card">
+                        <div class="card-header">
+                        <div class="input-icon">
+                            <input type="text" id="serviceNameSearchInput" value="" class="form-control" placeholder="Поиск" onkeyup="onSearch();">
+                            <span class="input-icon-addon">
+                                <!-- Download SVG icon from http://tabler-icons.io/i/search -->
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"></path><path d="M21 21l-6 -6"></path></svg>
+                            </span>
+                        </div>
+                        </div>
+                    <div class="list-group list-group-flush overflow-auto" style="max-height: 39rem" id="table_container">
+                      
+                        </div>
+                    </div>
+                        <!--Sample-->
+               
+                </div>
+                <div class="col-12 col-md-9 d-flex flex-column" id="note_body">
+                    <!--Sample-->
+               
+                    <!--Sample-->
+                </div>
+            </div>
+      
+    </div>
+</div>
+
+
+<script>            
+      $(document).ready(function () {
+        onReloadNoticeTable();
+    });
+
+    function onReloadNoticeTable()
+    {
+        showSpinner();
+        $.get('@Url.Action("GetNoticeList", "TextKeeper")', null, function (data) {
+            $('#table_container').html(data);
+            hideSpinner();
+        });
+    }
+
+    function onCreateNewNote() {
+        showSpinner();
+        $.get('@Url.Action("CreateNewNote", "TextKeeper")', null, function (data) {
+            hideSpinner();
+            onReloadNoticeTable();
+            onShowNotice(data);
+        });
+    }
+
+    function onShowNotice(ItemId) {
+        showSpinner();
+        $.get('@Url.Action("ShowNote", "TextKeeper")', { ItemId: ItemId }, function (data) {
+            $('#note_body').html(data);
+            hideSpinner();
+
+        });
+    }
+    </script>
+   

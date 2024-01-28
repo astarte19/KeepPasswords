@@ -1,0 +1,14 @@
+﻿@model List<KeepPasswords.Models.TextKeeper.NoticeItem>
+
+@foreach(var item in Model)
+{
+    <div class="list-group-item" onclick="onShowNotice('@item.ItemId')" style="cursor: pointer !important;">
+        <div class="row">
+           
+            <div class="col text-truncate">
+                <label class="text-body d-block">@item.Title</label>
+                <div class="text-secondary text-truncate mt-n1">Lorem ipsum dolor sit amet....</div>
+            </div>
+        </div>
+    </div>
+}

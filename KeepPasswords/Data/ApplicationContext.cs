@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using KeepPasswords.Models.Account;
 using KeepPasswords.Models.PasswordsKeeper;
+using KeepPasswords.Models.TextKeeper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -20,5 +21,6 @@ namespace KeepPasswords.Data
         public DbSet<UserSecretPhrase> UserSecretPhrases { get; set; }
         public DbSet<UserAvatar> UserAvatars { get; set; }
         public DbSet<PasswordItem> UserPasswordManager { get; set; }
+        public DbSet<NoticeItem> UserNotices { get; set; }
     }
 }
