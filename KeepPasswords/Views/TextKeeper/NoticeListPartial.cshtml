@@ -1,14 +1,26 @@
 ﻿@model List<KeepPasswords.Models.TextKeeper.NoticeItem>
-
+<style>
+    .list_item_pointer{
+        cursor: pointer !important;
+    }
+</style>
 @foreach(var item in Model)
 {
-    <div class="list-group-item" onclick="onShowNotice('@item.ItemId')" style="cursor: pointer !important;">
+    <div class="list-group-item list_item_pointer list_tab_item @((int)ViewBag.Selected == item.ItemId ? "active" : "")" onclick="onShowNotice('@item.ItemId');" data-tab-id="@item.ItemId" id="tab_@item.ItemId">
         <div class="row">
            
             <div class="col text-truncate">
-                <label class="text-body d-block">@item.Title</label>
-                <div class="text-secondary text-truncate mt-n1">Lorem ipsum dolor sit amet....</div>
+                <label class="text-body d-block list_item_pointer">@item.FormattedTitle</label>
+                <div class="text-secondary text-truncate mt-n1 cursor_pointer">@(!String.IsNullOrEmpty(item.TextWithoutHTML) ? item.TextWithoutHTML : "...")</div>
             </div>
         </div>
     </div>
+}
+@if (ViewBag.Selected !=null)
+{
+    <script>
+        $(document).ready(function () {
+            onShowNotice('@ViewBag.Selected');
+        });
+    </script>
 }

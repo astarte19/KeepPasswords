@@ -67,7 +67,7 @@
                             </span>
                         </div>
                         </div>
-                    <div class="list-group list-group-flush overflow-auto" style="max-height: 39rem" id="table_container">
+                    <div class="list-group list-group-flush overflow-auto" style="max-height: 37em" id="table_container">
                       
                         </div>
                     </div>
@@ -87,7 +87,7 @@
 
 <script>            
       $(document).ready(function () {
-        onReloadNoticeTable();
+        onReloadNoticeTable();               
     });
 
     function onReloadNoticeTable()
@@ -109,12 +109,76 @@
     }
 
     function onShowNotice(ItemId) {
+        document.cookie = 'TextKeeperSelectedNote=' + ItemId + '; path=/';
         showSpinner();
         $.get('@Url.Action("ShowNote", "TextKeeper")', { ItemId: ItemId }, function (data) {
+            onToggleActiveTab(ItemId);
             $('#note_body').html(data);
-            hideSpinner();
-
+            hideSpinner();             
         });
+    }
+
+    function onToggleActiveTab(id)
+    {
+        var tabs = document.getElementsByClassName('list_tab_item');
+        for(let i=0; i < tabs.length; i++)
+        {
+            var tempId = tabs[i].getAttribute("data-tab-id");
+            if (tempId == id) 
+            {
+                var element = document.getElementById('tab_' + tempId);
+                element.classList.add("active");
+            }
+            else
+            {
+                var element = document.getElementById('tab_' + tempId);
+                element.classList.remove("active");               
+            }
+        }
+    }
+
+    function onUpdateNotice(ItemId)
+    {
+        showSpinner();
+        var ValidField = true;
+        var model = {};
+        var NoticeText = tinymce.activeEditor.getContent();
+        var NoticeTitle = document.getElementById('notice_title').value;
+
+        if (NoticeTitle == '' || ValidField == null) 
+        {
+            ValidField = false;
+            hideSpinner();
+            AlertValidate('Заголовок не может быть пустым!');
+        }
+        model["ItemId"] = ItemId;
+        model["Title"] = NoticeTitle;
+        model["Text"] = NoticeText;
+
+        if (ValidField)
+        {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("UpdateNotice","TextKeeper")',
+                data: { model: model },
+                success: function (data) {
+                    if (data != null && data != '') {
+                        hideSpinner();
+                        AlertValidate(data);
+                    }
+                    else
+                    {
+                        hideSpinner();
+                        onReloadNoticeTable();                          
+                    }                    
+                    @*onToggleActiveTab(ItemId);*@
+                },
+                error: function () {
+                    hideSpinner();
+                    AlertValidate(xhr.respomseText);
+                }
+            });
+        }
     }
     </script>
    

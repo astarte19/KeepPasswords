@@ -4,6 +4,7 @@ using KeepPasswords.Models.TextKeeper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.RegularExpressions;
 
 namespace KeepPasswords.Controllers.TextKeeper
 {
@@ -30,6 +31,30 @@ namespace KeepPasswords.Controllers.TextKeeper
         {
             var user = await userManager.GetUserAsync(User);
             var model = context.UserNotices.Where(x => x.UserId.Equals(user.Id)).ToList();
+
+            if(model.Count()>0)
+            {                
+                ViewBag.Selected = model.First().ItemId;
+            }
+            
+            foreach(var item in model)
+            {                
+                item.FormattedTitle = new string(item.Title.Take(20).ToArray());
+                if(item.Title.Length>20)
+                {
+                    item.FormattedTitle += "...";
+                }
+                if(!String.IsNullOrEmpty(item.Text))
+                {
+                    item.TextWithoutHTML = new string(Regex.Replace(item.Text, "<[^>]+>", string.Empty).Take(10).ToArray()) + "...";
+                }
+               
+            }
+
+            if (!String.IsNullOrEmpty(HttpContext.Request.Cookies["TextKeeperSelectedNote"]))
+            {
+                ViewBag.Selected = Convert.ToInt32(HttpContext.Request.Cookies["TextKeeperSelectedNote"]);
+            }
             return PartialView("NoticeListPartial", model);
         }
 
@@ -56,6 +81,31 @@ namespace KeepPasswords.Controllers.TextKeeper
             var user = await userManager.GetUserAsync(User);
             var model = context.UserNotices.Where(x=>x.UserId.Equals(user.Id) && x.ItemId == ItemId).FirstOrDefault();
             return PartialView("NoticePartial", model);
+        }
+
+        public async Task<IActionResult> UpdateNotice([Bind] NoticeItem model)
+        {
+            try
+            {
+                var user = await userManager.GetUserAsync(User);
+                var existedModel = context.UserNotices.Where(x => x.ItemId == model.ItemId && x.UserId.Equals(user.Id)).FirstOrDefault();
+
+                if (existedModel == null)
+                {
+                    return Content("Повторите попытку позже!");
+                }
+
+                existedModel.Title = model.Title;
+                existedModel.Text = model.Text;
+                context.UserNotices.Update(existedModel);
+
+                await context.SaveChangesAsync();
+                return new EmptyResult();
+            }
+            catch(Exception ex)
+            {
+                return Content(ex.Message);
+            }
         }
     }
 }

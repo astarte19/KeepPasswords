@@ -11,6 +11,10 @@ namespace KeepPasswords.Models.TextKeeper
         public string UserId { get; set; }
 
         public string Title { get; set; }
-        public string? Text { get; set; } 
+        public string? Text { get; set; }
+        [NotMapped]
+        public string? TextWithoutHTML { get; set; }
+        [NotMapped]
+        public string FormattedTitle { get; set; }
     }
 }
