@@ -16,5 +16,9 @@ namespace KeepPasswords.Models.TextKeeper
         public string? TextWithoutHTML { get; set; }
         [NotMapped]
         public string FormattedTitle { get; set; }
+        [NotMapped]
+        public string DecryptedTitle { get; set; }
+        [NotMapped]
+        public string? DecryptedText { get; set; }
     }
 }

@@ -1,42 +1,45 @@
-﻿@model KeepPasswords.Models.TextKeeper.NoticeItem
-<input type="hidden" id="selectedNoteId" value="@Model.ItemId"/>
-<div class="container-xl">
-    <div class="card">
-        <div class="card-body">
-            <div class="mb-3">
-                <label class="form-label">Заголовок</label>
-                <input type="text" class="form-control" placeholder="Name" value="@Model.Title" id="notice_title">
+﻿@model KeepPasswords.Models.TextKeeper.NoticeItem?
+@if(Model!=null)
+{
+    <input type="hidden" id="selectedNoteId" value="@Model.ItemId" />
+    <div class="container-xl">
+        <div class="card">
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Заголовок</label>
+                    <input type="text" class="form-control" placeholder="Name" value="@Model.DecryptedTitle" id="notice_title">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Текст</label>
+                    <form method="post">
+                        <textarea id="tinymce-mytextarea">@Model.DecryptedText</textarea>
+                    </form>
+                </div>
             </div>
-            <div class="mb-3">
-                <label class="form-label">Текст</label>
-                <form method="post">
-                    <textarea id="tinymce-mytextarea">@Model.Text</textarea>
-                </form>
+            <div class="card-footer">
+                <a onclick="onUpdateNotice('@Model.ItemId')" class="btn btn-dark">Сохранить</a>
             </div>
-        </div>
-        <div class="card-footer">
-            <a onclick="onUpdateNotice('@Model.ItemId')" class="btn btn-dark">Сохранить</a>
         </div>
     </div>
-</div>
 
-<script>
-    $(document).ready(function () {
-        tinyMCE.remove();
+    <script>
+        $(document).ready(function () {
+            tinyMCE.remove();
 
-        let options = {
-            selector: '#tinymce-mytextarea',
-            height: 350,
-            menubar: false,
-            statusbar: false,
-            plugins: "powerpaste casechange searchreplace autolink directionality advcode visualblocks visualchars image link media mediaembed codesample table charmap pagebreak nonbreaking anchor tableofcontents insertdatetime advlist lists checklist wordcount tinymcespellchecker editimage help formatpainter permanentpen charmap linkchecker emoticons advtable export print autosave",
-            toolbar: "undo redo print spellcheckdialog formatpainter | blocks fontfamily fontsize | bold italic underline forecolor backcolor | link image addcomment showcomments  | alignleft aligncenter alignright alignjustify lineheight | checklist bullist numlist indent outdent | removeformat",
-            content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif; font-size: 14px; -webkit-font-smoothing: antialiased; }'
-        }
-        if (localStorage.getItem("tablerTheme") === 'dark') {
-            options.skin = 'oxide-dark';
-            options.content_css = 'dark';
-        }
-        tinyMCE.init(options);
-    });    
-</script>
+            let options = {
+                selector: '#tinymce-mytextarea',
+                height: 350,
+                menubar: false,
+                statusbar: false,
+                plugins: "powerpaste casechange searchreplace autolink directionality advcode visualblocks visualchars image link media mediaembed codesample table charmap pagebreak nonbreaking anchor tableofcontents insertdatetime advlist lists checklist wordcount tinymcespellchecker editimage help formatpainter permanentpen charmap linkchecker emoticons advtable export print autosave",
+                toolbar: "undo redo print spellcheckdialog formatpainter | blocks fontfamily fontsize | bold italic underline forecolor backcolor | link image addcomment showcomments  | alignleft aligncenter alignright alignjustify lineheight | checklist bullist numlist indent outdent | removeformat",
+                content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif; font-size: 14px; -webkit-font-smoothing: antialiased; }'
+            }
+            if (localStorage.getItem("tablerTheme") === 'dark') {
+                options.skin = 'oxide-dark';
+                options.content_css = 'dark';
+            }
+            tinyMCE.init(options);
+        });
+    </script>
+}

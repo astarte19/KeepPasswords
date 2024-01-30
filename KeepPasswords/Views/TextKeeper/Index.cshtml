@@ -104,7 +104,10 @@
         $.get('@Url.Action("CreateNewNote", "TextKeeper")', null, function (data) {
             hideSpinner();
             onReloadNoticeTable();
-            onShowNotice(data);
+            if(data!=null && data!='')
+            {
+                onShowNotice(data);
+            }                       
         });
     }
 
