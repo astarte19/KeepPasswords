@@ -158,6 +158,7 @@ namespace KeepPasswords.Controllers.Account
                 return Content($"{ex.Message}");
             }
         }
+
         [Authorize]
         public async Task<IActionResult> UploadAvatar()
         {
@@ -303,6 +304,7 @@ namespace KeepPasswords.Controllers.Account
             }
         }
 
+        [Authorize]
         public async Task ChangePasswordManagerUserDataCipher(string oldSecretKey,string newSecretKey)
         {
             var user = await _userManager.FindByNameAsync(User.Identity.Name);
