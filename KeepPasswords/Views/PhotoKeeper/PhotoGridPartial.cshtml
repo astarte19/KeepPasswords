@@ -3,7 +3,7 @@
     @foreach(var item in Model)
     {
     <div class="col">
-        <a data-fslightbox="gallery" href="~/static/photos/beautiful-blonde-woman-relaxing-with-a-can-of-coke-on-a-tree-stump-by-the-beach.jpg">
+        <a data-fancybox="gallery" href="data:image/jpeg;base64,@(Convert.ToBase64String(item.DecryptedPhotoBytes))">
             <!-- Photo -->
             <div class="img-responsive img-responsive-1x1 rounded border" style="background-image: url(data:image/jpeg;base64,@(Convert.ToBase64String(item.DecryptedPhotoBytes)))"></div>
         </a>
