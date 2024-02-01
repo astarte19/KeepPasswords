@@ -1,0 +1,92 @@
+﻿
+<link href="~/css/dist/libs/dropzone/dist/dropzone.css" rel="stylesheet" />
+<!-- Page header -->
+<div class="page-header d-print-none">
+    <div class="container-xl">
+        <div class="row g-2 align-items-center">
+            <div class="col">
+                <!-- Page pre-title -->
+                <div class="page-pretitle">
+                    Обзор
+                </div>
+                <h2 class="page-title">
+                    Менеджер фото
+                </h2>
+            </div>
+            <!-- Page title actions -->
+            <div class="col-auto ms-auto d-print-none">
+
+                @if ((bool)ViewBag.HasSecretPhrase)
+                {
+                    <div class="btn-list">
+
+                        <a class="btn btn-dark d-none d-sm-inline-block" onclick="onShowModalUploadPhoto()">
+                            <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
+                            Новые фото
+                        </a>
+                        <a class="btn btn-dark d-sm-none btn-icon" aria-label="Добавить новый сервис" onclick="onShowModalUploadPhoto()">
+                            <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="btn-list" style="cursor: pointer !important;" title="Для пользователя не установлен SecretPhrase! Необходимо добавить его в настройках!">
+
+                        <a class="btn btn-dark d-none d-sm-inline-block disabled">
+                            <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
+                            Новые фото
+                        </a>
+                        <a class="btn btn-dark d-sm-none btn-icon disabled">
+                            <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
+                        </a>
+                    </div>
+                }
+                
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Page body -->
+<div class="page-body">
+    <div class="container-xl">
+        <div class="row row-cols-6 g-3" id="photo_grid">
+         
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        onReloadPhotoGrid();
+    });
+
+    function onReloadPhotoGrid() {
+        showSpinner();
+        $.get('@Url.Action("GetPhotos", "PhotoKeeper")', null, function (data) {
+            $('#photo_grid').html(data);
+            hideSpinner();
+        });
+    }
+
+    function onShowModalUploadPhoto()
+    {
+        $.get('@Url.Action("ShowModalUploadPhoto", "PhotoKeeper")', null, function (data) {
+            $('#modal_body').html(data);
+            globalOpenModal();
+        });
+    }
+
+    function AlertSuccessAndReload(message) {
+        $.get('@Url.Action("ShowModalSuccess", "PhotoKeeper")', { message: message }, function (data) {
+            $('#modal_body').html(data);
+            globalOpenModal();
+        });
+
+    }
+
+</script>

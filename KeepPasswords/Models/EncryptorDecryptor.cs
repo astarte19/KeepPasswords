@@ -39,5 +39,47 @@ namespace KeepPasswords.Models
                 return Encoding.UTF8.GetString(decryptedBytes);
             }
         }
+
+        public static byte[] EncryptBytes(byte[] plainBytes, byte[] key)
+        {
+            using (Aes aesAlg = Aes.Create())
+            {
+                aesAlg.Key = key;
+                aesAlg.Mode = CipherMode.ECB;
+
+                ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, null);
+                using (var msEncrypt = new System.IO.MemoryStream())
+                {
+                    using (var csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                    {
+                        csEncrypt.Write(plainBytes, 0, plainBytes.Length);
+                        csEncrypt.FlushFinalBlock();
+                        return msEncrypt.ToArray();
+                    }
+                }
+            }
+        }
+
+        public static byte[] DecryptBytes(byte[] cipherBytes, byte[] key)
+        {
+            using (Aes aesAlg = Aes.Create())
+            {
+                aesAlg.Key = key;
+                aesAlg.Mode = CipherMode.ECB;
+
+                ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, null);
+                using (var msDecrypt = new System.IO.MemoryStream(cipherBytes))
+                {
+                    using (var csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+                    {
+                        using (var decryptedData = new System.IO.MemoryStream())
+                        {
+                            csDecrypt.CopyTo(decryptedData);
+                            return decryptedData.ToArray();
+                        }
+                    }
+                }
+            }
+        }
     }
 }

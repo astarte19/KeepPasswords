@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using KeepPasswords.Models.Account;
 using KeepPasswords.Models.PasswordsKeeper;
+using KeepPasswords.Models.PhotoKeeper;
 using KeepPasswords.Models.TextKeeper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -22,5 +23,6 @@ namespace KeepPasswords.Data
         public DbSet<UserAvatar> UserAvatars { get; set; }
         public DbSet<PasswordItem> UserPasswordManager { get; set; }
         public DbSet<NoticeItem> UserNotices { get; set; }
+        public DbSet<PhotoItem> UserPhotos { get; set; }
     }
 }

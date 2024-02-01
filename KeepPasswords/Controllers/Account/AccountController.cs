@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Policy;
 using KeepPasswords.Models;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Text;
 
 namespace KeepPasswords.Controllers.Account
 {
@@ -285,6 +287,8 @@ namespace KeepPasswords.Controllers.Account
                 if(secretKey != null)
                 {
                     await ChangePasswordManagerUserDataCipher(secretKey.SecretPhrase,SecretPhrase);
+                    await ChangeTextManagerUserDataCipher(secretKey.SecretPhrase, SecretPhrase);
+                    //await ChangePhotoManagerUserDataCipher(secretKey.SecretPhrase, SecretPhrase);
                     secretKey.SecretPhrase = SecretPhrase;
                     context.UserSecretPhrases.Update(secretKey);                    
                 }
@@ -316,6 +320,42 @@ namespace KeepPasswords.Controllers.Account
                 item.Password = encryptedPassword;
             }
             context.UserPasswordManager.UpdateRange(userPasswordManager);
+            await context.SaveChangesAsync();
+
+        }
+
+        [Authorize]
+        public async Task ChangeTextManagerUserDataCipher(string oldSecretKey, string newSecretKey)
+        {
+            var user = await _userManager.FindByNameAsync(User.Identity.Name);
+            var userNotices = context.UserNotices.Where(x => x.UserId.Equals(user.Id));
+            foreach (var item in userNotices)
+            {
+                string decryptedTitle = EncryptorDecryptor.DecryptToPlainText(oldSecretKey, item.Title);
+                string encryptedTitle = EncryptorDecryptor.EncryptPlainText(newSecretKey, decryptedTitle);
+                item.Title = encryptedTitle;
+
+                string decryptedText = EncryptorDecryptor.DecryptToPlainText(oldSecretKey, item.Text);
+                string encryptedText = EncryptorDecryptor.EncryptPlainText(newSecretKey, decryptedText);
+                item.Text = encryptedText;
+            }
+            context.UserNotices.UpdateRange(userNotices);
+            await context.SaveChangesAsync();
+
+        }
+
+        [Authorize]
+        public async Task ChangePhotoManagerUserDataCipher(string oldSecretKey, string newSecretKey)
+        {
+            var user = await _userManager.FindByNameAsync(User.Identity.Name);
+            var userPhotos = context.UserPhotos.Where(x => x.UserId.Equals(user.Id));
+            foreach (var item in userPhotos)
+            {
+                byte[] decryptedBytes = EncryptorDecryptor.DecryptBytes(Convert.FromBase64String(oldSecretKey), item.PhotoBytes);
+                byte[] encryptedBytes = EncryptorDecryptor.EncryptBytes(Convert.FromBase64String(newSecretKey), decryptedBytes);
+                item.PhotoBytes = encryptedBytes;                
+            }
+            context.UserPhotos.UpdateRange(userPhotos);
             await context.SaveChangesAsync();
 
         }

@@ -1,0 +1,78 @@
+﻿<script src="~/css/dist/libs/dropzone/dist/dropzone-min.js" defer></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" />
+
+<style>
+    .delete_icon{
+        color: #d0222e;
+    }
+    .delete_icon:hover{
+            color: #ac1a24;
+    }
+</style>
+<div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">Новые фото</h5>
+            <button type="button" class="btn-close" onclick="globalCloseModal()"></button>
+        </div>
+        <div class="modal-body">          
+            <form class="dropzone" id="my-great-dropzone" action="./" autocomplete="off" novalidate style="max-height: 400px;overflow-y:auto;">
+                <div class="fallback">
+                    <input name="file" type="file" multiple/>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn me-auto" onclick="globalCloseModal()">Отмена</button>
+            <button type="button" class="btn btn-dark" onclick="onUploadPhoto()">Загрузить</button>
+        </div>
+    </div>
+</div>
+<script>
+    var dropZone; 
+    $(document).ready(function () 
+    {
+        Dropzone.autoDiscover = false;
+        var myDropzone = new Dropzone("#my-great-dropzone", {
+                addRemoveLinks: true,
+                dictRemoveFileConfirmation: "Убрать фото с загрузки?",
+                dictMaxFilesExceeded: "Максимальное количество для загрузки - 12 файлов!",
+                dictInvalidFileType: "Форматы только JPG/JPEG/PNG",
+                init: function () {
+                    this.on("complete", function (file) {
+                        $(".dz-remove").html("<span class='fa fa-x delete_icon' style='font-size: 1.2em;margin-top: 5px;cursor: pointer;'></span>");
+                    });
+                },
+                acceptedFiles: ".jpeg,.png,.jpg",
+                maxFilesize: 5,
+                maxFiles: 12
+        });
+
+        dropZone = myDropzone;
+        
+    });
+
+    function onUploadPhoto() 
+    {
+        showSpinner();         
+        if (dropZone.getAcceptedFiles().length > 0) {
+            for (var i = 0; i < dropZone.getAcceptedFiles().length; i++) {
+                var photo = dropZone.getAcceptedFiles()[i];
+                var data = new FormData();
+                data.append("file", photo);
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("UploadPhoto","PhotoKeeper")',
+                    contentType: false,
+                    processData: false,
+                    data: data,
+                    success: function (data) {},
+                    error: function () {}
+                });
+            }
+            hideSpinner();            
+            AlertSuccessAndReload('Фото загружено');
+        }
+        
+    }
+</script>
