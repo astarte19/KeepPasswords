@@ -1,8 +1,21 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
-
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+﻿
+<div class="page-body">
+    <div class="container-xl d-flex flex-column justify-content-center">
+        <div class="empty">
+            <div class="empty-img">
+                <img src="~/static/illustrations/undraw_printing_invoices_5r4r.svg" height="128" alt="">
+            </div>
+            <p class="empty-title">Страница в разработке</p>
+            <p class="empty-subtitle text-secondary">
+                Не знаю, что тут можно реализовать
+            </p>
+            <div class="empty-action">
+                <a asp-controller="Account" asp-action="AccountSettings" class="btn btn-dark">
+                    <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
+                    Настройки профиля
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
