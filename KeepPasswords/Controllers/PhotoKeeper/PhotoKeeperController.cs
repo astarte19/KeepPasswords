@@ -58,7 +58,36 @@ namespace KeepPasswords.Controllers.PhotoKeeper
             return PartialView("ModalUploadPhoto");
         }
 
+        public async Task<IActionResult> DeletePhoto()
+        {
+            try
+            {
+                int ItemId = 0;
+                if (HttpContext.Request.Cookies["SelectedPhotoItemId"] != null)
+                {
+                    ItemId = Convert.ToInt32(HttpContext.Request.Cookies["SelectedPhotoItemId"]);
+                }
+                if(ItemId == 0)
+                {
+                    return Content("Возникла ошибка при удалении фото, фото не было удалено! Повторите попытку позже!");
+                }
+                var user = await userManager.GetUserAsync(User);
+                var photo = context.UserPhotos.Where(x => x.ItemId == ItemId && x.UserId.Equals(user.Id)).FirstOrDefault();
 
+                if(photo == null)
+                {
+                    return Content("Возникла ошибка при удалении фото! Фото не найдено или не принадлежит пользователю!");
+                }
+
+                context.UserPhotos.Remove(photo);
+                await context.SaveChangesAsync();
+                return new EmptyResult();    
+            }
+            catch (Exception ex)
+            {
+                return Content(ex.Message);
+            }
+        }
         public async Task<IActionResult> UploadPhoto()
         {
             try

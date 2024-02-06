@@ -1,4 +1,6 @@
-﻿<script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js">
+﻿<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js">
 </script>
 <link rel="stylesheet"
       href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
@@ -65,7 +67,11 @@
 </div>
 <script>
     $(document).ready(function () {
-        onReloadPhotoGrid();        
+        onReloadPhotoGrid();      
+        $.fancybox.defaults.btnTpl.dlt = '<button data-fancybox-dlt class="glyphicon glyphicon-trash fancybox-button fancybox-button--dlt" title="Удалить фото"></button>';
+        $('body').on('click', '[data-fancybox-dlt]', function () {
+            onDeletePhoto();            
+        });
     });
 
     function onReloadPhotoGrid() {
@@ -92,4 +98,46 @@
 
     }
 
+
+    function onDeletePhoto() { 
+        var isDelete = confirm("Фото будет удалено без возможности восстановления, продолжить?");
+
+        if (isDelete)
+        {
+            $.get('@Url.Action("DeletePhoto", "PhotoKeeper")', null, function (data) {
+                $.fancybox.close();
+                if (data != '' && data != null) {
+                    AlertValidate(data);
+                }
+                else {
+                    onReloadPhotoGrid();
+                }
+            });
+        }        
+    }
+
+    function onOpenGallery(src,photoName,itemId)
+    {
+        document.cookie = 'SelectedPhotoItemId=' + itemId + '; path=/';
+        var PhotoList = new Array();
+        let Photos = {};
+        Photos["src"] = src;
+        Photos["opts"] = {
+            caption: photoName, id: itemId, path: src
+        };
+
+        PhotoList.push(Photos);
+        $.fancybox.open(PhotoList, {
+            loop: true,
+            buttons: [
+                'zoom',                
+                'download',
+                'dlt',
+                'close'
+            ]
+
+        });
+
+        
+    }
 </script>
