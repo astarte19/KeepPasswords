@@ -44,7 +44,7 @@ namespace KeepPasswords.Controllers.PhotoKeeper
             var model = context.UserPhotos.Where(x => x.UserId.Equals(user.Id)).ToList();
             foreach(var item in model)
             {
-                item.DecryptedPhotoBytes = item.PhotoBytes;//EncryptorDecryptor.DecryptBytes(Convert.FromBase64String(key), item.PhotoBytes);
+                item.DecryptedPhotoBytes = EncryptorDecryptor.DecryptBytes(item.PhotoBytes, key);
             }
             return PartialView("PhotoGridPartial", model);
         }
@@ -106,7 +106,7 @@ namespace KeepPasswords.Controllers.PhotoKeeper
 
                     PhotoItem photoItem = new PhotoItem();
                     photoItem.UserId = user.Id;
-                    photoItem.PhotoBytes = imageData;//EncryptorDecryptor.EncryptBytes(Convert.FromBase64String(key), imageData);
+                    photoItem.PhotoBytes = EncryptorDecryptor.EncryptBytes(imageData, key);
                     photoItem.FileName = Photo.FileName;
                     context.UserPhotos.Add(photoItem);
                     await context.SaveChangesAsync();

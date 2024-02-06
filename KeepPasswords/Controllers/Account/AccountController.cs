@@ -351,8 +351,8 @@ namespace KeepPasswords.Controllers.Account
             var userPhotos = context.UserPhotos.Where(x => x.UserId.Equals(user.Id));
             foreach (var item in userPhotos)
             {
-                byte[] decryptedBytes = EncryptorDecryptor.DecryptBytes(Convert.FromBase64String(oldSecretKey), item.PhotoBytes);
-                byte[] encryptedBytes = EncryptorDecryptor.EncryptBytes(Convert.FromBase64String(newSecretKey), decryptedBytes);
+                byte[] decryptedBytes = EncryptorDecryptor.DecryptBytes(item.PhotoBytes, oldSecretKey);
+                byte[] encryptedBytes = EncryptorDecryptor.EncryptBytes(decryptedBytes, newSecretKey);
                 item.PhotoBytes = encryptedBytes;                
             }
             context.UserPhotos.UpdateRange(userPhotos);

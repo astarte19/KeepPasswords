@@ -40,46 +40,57 @@ namespace KeepPasswords.Models
             }
         }
 
-        public static byte[] EncryptBytes(byte[] plainBytes, byte[] key)
+        public static byte[] EncryptBytes(byte[] plainBytes, string key)
         {
-            using (Aes aesAlg = Aes.Create())
+            byte[] encryptedBytes;
+            using (RijndaelManaged rijndael = new RijndaelManaged())
             {
-                aesAlg.Key = key;
-                aesAlg.Mode = CipherMode.ECB;
+                rijndael.Key = Encoding.UTF8.GetBytes(key);
+                rijndael.Mode = CipherMode.CBC;
 
-                ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, null);
-                using (var msEncrypt = new System.IO.MemoryStream())
+                ICryptoTransform encryptor = rijndael.CreateEncryptor(rijndael.Key, rijndael.IV);
+
+                using (MemoryStream ms = new MemoryStream())
                 {
-                    using (var csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                    using (CryptoStream cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
                     {
-                        csEncrypt.Write(plainBytes, 0, plainBytes.Length);
-                        csEncrypt.FlushFinalBlock();
-                        return msEncrypt.ToArray();
+                        cs.Write(plainBytes, 0, plainBytes.Length);
+                        cs.FlushFinalBlock();
                     }
+                    encryptedBytes = ms.ToArray();
                 }
             }
+            return encryptedBytes;
         }
 
-        public static byte[] DecryptBytes(byte[] cipherBytes, byte[] key)
+        public static byte[] DecryptBytes(byte[] encryptedBytes, string key)
         {
-            using (Aes aesAlg = Aes.Create())
+            byte[] decryptedBytes;
+            using (RijndaelManaged rijndael = new RijndaelManaged())
             {
-                aesAlg.Key = key;
-                aesAlg.Mode = CipherMode.ECB;
+                rijndael.Key = Encoding.UTF8.GetBytes(key);
+                rijndael.Mode = CipherMode.CBC;
 
-                ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, null);
-                using (var msDecrypt = new System.IO.MemoryStream(cipherBytes))
+                ICryptoTransform decryptor = rijndael.CreateDecryptor(rijndael.Key, rijndael.IV);
+
+                using (MemoryStream ms = new MemoryStream(encryptedBytes))
                 {
-                    using (var csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+                    using (CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read))
                     {
-                        using (var decryptedData = new System.IO.MemoryStream())
+                        using (MemoryStream outputMs = new MemoryStream())
                         {
-                            csDecrypt.CopyTo(decryptedData);
-                            return decryptedData.ToArray();
+                            byte[] buffer = new byte[1024];
+                            int bytesRead;
+                            while ((bytesRead = cs.Read(buffer, 0, buffer.Length)) > 0)
+                            {
+                                outputMs.Write(buffer, 0, bytesRead);
+                            }
+                            decryptedBytes = outputMs.ToArray();
                         }
                     }
                 }
             }
+            return decryptedBytes;
         }
     }
 }
