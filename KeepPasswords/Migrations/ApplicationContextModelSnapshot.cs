@@ -103,6 +103,35 @@ namespace KeepPasswords.Migrations
                     b.ToTable("UserAvatars");
                 });
 
+            modelBuilder.Entity("KeepPasswords.Models.Calendar.CalendarItem", b =>
+                {
+                    b.Property<int>("ItemId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("EventName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ItemId");
+
+                    b.ToTable("UserCalendarEvents");
+                });
+
             modelBuilder.Entity("KeepPasswords.Models.PasswordsKeeper.PasswordItem", b =>
                 {
                     b.Property<int>("ItemId")

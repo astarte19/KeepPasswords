@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using KeepPasswords.Models.Account;
+using KeepPasswords.Models.Calendar;
 using KeepPasswords.Models.PasswordsKeeper;
 using KeepPasswords.Models.PhotoKeeper;
 using KeepPasswords.Models.TextKeeper;
@@ -24,5 +25,6 @@ namespace KeepPasswords.Data
         public DbSet<PasswordItem> UserPasswordManager { get; set; }
         public DbSet<NoticeItem> UserNotices { get; set; }
         public DbSet<PhotoItem> UserPhotos { get; set; }
+        public DbSet<CalendarItem> UserCalendarEvents { get; set; }
     }
 }
