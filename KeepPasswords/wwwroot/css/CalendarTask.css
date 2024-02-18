@@ -15,7 +15,7 @@
     --title-color: #182433;
 }
 
-    :root[theme='dark'] {
+    :root[data-bs-theme='dark'] {
         --text-color: #fff;
         --body-background: #18181b;
         --swipe-btns-hover-color: whitesmoke;
@@ -26,12 +26,12 @@
         --border-color: #e2e8f0;
         --border-radius: 0.5rem;
         --max-height: 70vh;
-        --title-color: #dce1e7;
+        --title-color: white;
     }
 
-.page-title {
+/*.page-title {
     color: var(--title-color)
-}
+}*/
 
 button {
     color: var(--text-color);
@@ -43,13 +43,15 @@ body {
     /*font-size: 100%;*/
     line-height: 1.5;
     /*background: var(--body-background) !important;*/
-    color: #444;
+    /*color: #444;*/
 }
 
 .main_calendar_container {
     display: grid;
 }
-
+.Mounth{
+    color: black;
+}
 
 
 .terminals_title {
@@ -82,9 +84,9 @@ img {
     width: 100%;
     /* margin: 3em auto;*/
     /*padding: 2em;*/
-    border: 1px solid var(--body-background);
+    /*border: 1px solid var(--tblr-active-bg);*/
     border-radius: 5px;
-    background: var(--body-background);
+   /* background: var(--tblr-active-bg);*/
 }
 
 
@@ -344,12 +346,12 @@ td ::-webkit-scrollbar-thumb {
     width: max-content;
     max-width: 90%;
     height: max-content;
-    border: 1px solid #9d9d9d;
+   
     max-height: 10vh;
     border-radius: var(--border-radius);
     padding: 0 5px 0 5px;
     margin-bottom: 5px;
-    font-size: 14px;
+    font-size: 12px;
     overflow-x: hidden;
 }
 
@@ -362,11 +364,12 @@ td ::-webkit-scrollbar-thumb {
         opacity: 0.5;
     }
 
-    .taskName {
-        display: inline-block;
-        line-height: 22px;
-        white-space: break-spaces;
-    }
+.taskName {
+    display: inline-block;
+    line-height: 22px;
+    white-space: break-spaces;
+    font-weight: 500;
+}
 
 
 

@@ -1,16 +1,20 @@
 ﻿<link rel="stylesheet" href="~/css/CalendarTask.css" />
+<link href="~/css/dist/libs/melloware/coloris/dist/coloris.min.css" rel="stylesheet" />
 <div class="calendar-wrapper">
-   @* <span class="loadingCalendar">
+    <span class="loadingCalendar">
         <div class="SpinnerTextContainer">
             <div class="spinner-border spinner-border-sm text-secondary" role="status"></div>
             <span>Загрузка</span>
         </div>
 
-    </span>*@
+    </span>
     <div class="Btn-PN">
     </div>
     <div id="divCal"></div>
 </div>
+
+<script src="~/css/dist/libs/melloware/coloris/dist/umd/coloris.min.js" defer></script>
+
 <script type="text/javascript">
     var c;
 
@@ -256,6 +260,12 @@
         });
     }
 
+    function globalCloseModalReloadCalendar()
+    {
+        globalCloseModal();
+        UpdateCalendarData();
+    }
+
     function getRandomColor() {
         var letters = '0123456789ABCDEF';
         var color = '#';
@@ -282,6 +292,35 @@
         $('.loadingCalendar').hide();
     }
    
+    function onCreateEvent(date)
+    {
+        $.get('@Url.Action("CreateNewEvent", "CalendarKeeper")', { currentDate: date }, function (data) {
+            if(data!=null && data!='')
+            {
+                AlertValidate(data);
+            }
+            else
+            {
+                onDefaultCalendarClick(date);
+            }
+            
+        });
+    }
+
+    function onDeleteEvent(ItemId,date) {
+        $.get('@Url.Action("DeleteEvent", "CalendarKeeper")', { ItemId: ItemId }, function (data) {
+            if (data != null && data != '') {
+                AlertValidate(data);
+            }
+            else {
+                onDefaultCalendarClick(date);
+            }
+
+        });
+    }
+
+   
+
     function onDefaultCalendarClick(date) {
         $.get('@Url.Action("ShowModalDayEvents", "CalendarKeeper")', { currentDate: date }, function (data) {
             $('#modal_body').html(data);
