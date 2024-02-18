@@ -40,57 +40,51 @@ namespace KeepPasswords.Models
             }
         }
 
-        public static byte[] EncryptBytes(byte[] plainBytes, string key)
+        public static byte[] EncryptBytes(byte[] imageData, byte[] key)
         {
-            byte[] encryptedBytes;
-            using (RijndaelManaged rijndael = new RijndaelManaged())
+            byte[] IV = new byte[] { 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 };
+            using (AesCryptoServiceProvider aes = new AesCryptoServiceProvider())
             {
-                rijndael.Key = Encoding.UTF8.GetBytes(key);
-                rijndael.Mode = CipherMode.CBC;
+                aes.Key = key;
+                aes.IV = IV;
 
-                ICryptoTransform encryptor = rijndael.CreateEncryptor(rijndael.Key, rijndael.IV);
-
-                using (MemoryStream ms = new MemoryStream())
+                using (MemoryStream msInput = new MemoryStream(imageData))
                 {
-                    using (CryptoStream cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
+                    using (MemoryStream msOutput = new MemoryStream())
                     {
-                        cs.Write(plainBytes, 0, plainBytes.Length);
-                        cs.FlushFinalBlock();
+                        using (CryptoStream cryptoStream = new CryptoStream(msOutput, aes.CreateEncryptor(), CryptoStreamMode.Write))
+                        {
+                            msInput.CopyTo(cryptoStream);
+                        }
+
+                        return msOutput.ToArray();
                     }
-                    encryptedBytes = ms.ToArray();
                 }
             }
-            return encryptedBytes;
         }
 
-        public static byte[] DecryptBytes(byte[] encryptedBytes, string key)
+        public static byte[] DecryptBytes(byte[] imageData, byte[] key)
         {
-            byte[] decryptedBytes;
-            using (RijndaelManaged rijndael = new RijndaelManaged())
+            byte[] IV = new byte[] { 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 };
+            using (AesCryptoServiceProvider aes = new AesCryptoServiceProvider())
             {
-                rijndael.Key = Encoding.UTF8.GetBytes(key);
-                rijndael.Mode = CipherMode.CBC;
+                aes.Key = key;
+                aes.IV = IV;
 
-                ICryptoTransform decryptor = rijndael.CreateDecryptor(rijndael.Key, rijndael.IV);
-
-                using (MemoryStream ms = new MemoryStream(encryptedBytes))
+                using (MemoryStream msInput = new MemoryStream(imageData))
                 {
-                    using (CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read))
+                    using (MemoryStream msOutput = new MemoryStream())
                     {
-                        using (MemoryStream outputMs = new MemoryStream())
+                        using (CryptoStream cryptoStream = new CryptoStream(msInput, aes.CreateDecryptor(), CryptoStreamMode.Read))
                         {
-                            byte[] buffer = new byte[1024];
-                            int bytesRead;
-                            while ((bytesRead = cs.Read(buffer, 0, buffer.Length)) > 0)
-                            {
-                                outputMs.Write(buffer, 0, bytesRead);
-                            }
-                            decryptedBytes = outputMs.ToArray();
+                            cryptoStream.CopyTo(msOutput);
                         }
+
+                        return msOutput.ToArray();
                     }
                 }
             }
-            return decryptedBytes;
         }
     }
 }
+

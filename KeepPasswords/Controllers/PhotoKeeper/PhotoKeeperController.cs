@@ -15,6 +15,7 @@ using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authorization;
 using KeepPasswords.Models.PhotoKeeper;
 using KeepPasswords.Models;
+using System.Text.Unicode;
 
 namespace KeepPasswords.Controllers.PhotoKeeper
 {
@@ -44,7 +45,8 @@ namespace KeepPasswords.Controllers.PhotoKeeper
             var model = context.UserPhotos.Where(x => x.UserId.Equals(user.Id)).ToList();
             foreach(var item in model)
             {
-                item.DecryptedPhotoBytes = EncryptorDecryptor.DecryptBytes(item.PhotoBytes, key);
+                UTF8Encoding utf8 = new UTF8Encoding();
+                item.DecryptedPhotoBytes = EncryptorDecryptor.DecryptBytes(item.PhotoBytes, utf8.GetBytes(key));
             }
             return PartialView("PhotoGridPartial", model);
         }
@@ -103,10 +105,10 @@ namespace KeepPasswords.Controllers.PhotoKeeper
                     {
                         imageData = binaryReader.ReadBytes((int)Photo.Length);
                     }
-
+                    UTF8Encoding utf8 = new UTF8Encoding();
                     PhotoItem photoItem = new PhotoItem();
                     photoItem.UserId = user.Id;
-                    photoItem.PhotoBytes = EncryptorDecryptor.EncryptBytes(imageData, key);
+                    photoItem.PhotoBytes = EncryptorDecryptor.EncryptBytes(imageData, utf8.GetBytes(key));
                     photoItem.FileName = Photo.FileName;
                     context.UserPhotos.Add(photoItem);
                     await context.SaveChangesAsync();

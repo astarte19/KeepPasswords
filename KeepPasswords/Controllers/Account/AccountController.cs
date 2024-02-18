@@ -288,7 +288,7 @@ namespace KeepPasswords.Controllers.Account
                 {
                     await ChangePasswordManagerUserDataCipher(secretKey.SecretPhrase,SecretPhrase);
                     await ChangeTextManagerUserDataCipher(secretKey.SecretPhrase, SecretPhrase);
-                    //await ChangePhotoManagerUserDataCipher(secretKey.SecretPhrase, SecretPhrase);
+                    await ChangePhotoManagerUserDataCipher(secretKey.SecretPhrase, SecretPhrase);
                     secretKey.SecretPhrase = SecretPhrase;
                     context.UserSecretPhrases.Update(secretKey);                    
                 }
@@ -351,9 +351,10 @@ namespace KeepPasswords.Controllers.Account
             var userPhotos = context.UserPhotos.Where(x => x.UserId.Equals(user.Id));
             foreach (var item in userPhotos)
             {
-                byte[] decryptedBytes = EncryptorDecryptor.DecryptBytes(item.PhotoBytes, oldSecretKey);
-                byte[] encryptedBytes = EncryptorDecryptor.EncryptBytes(decryptedBytes, newSecretKey);
-                item.PhotoBytes = encryptedBytes;                
+                UTF8Encoding utf8 = new UTF8Encoding();
+                byte[] decryptedBytes = EncryptorDecryptor.DecryptBytes(item.PhotoBytes, utf8.GetBytes(oldSecretKey));
+                byte[] encryptedBytes = EncryptorDecryptor.EncryptBytes(decryptedBytes, utf8.GetBytes(newSecretKey));
+                item.PhotoBytes = encryptedBytes;
             }
             context.UserPhotos.UpdateRange(userPhotos);
             await context.SaveChangesAsync();
