@@ -116,6 +116,30 @@ namespace KeepPasswords.Controllers.TextKeeper
             return PartialView("NoticePartial", model);
         }
 
+        public async Task<IActionResult> ShowModalDeleteNotice(int ItemId)
+        {
+            return PartialView("ModalDeleteConfirmation", ItemId);
+        }
+
+        public async Task<IActionResult> DeleteNotice(int ItemId)
+        {
+            try
+            {
+                var user = await userManager.GetUserAsync(User);
+                var model = context.UserNotices.Where(x => x.UserId.Equals(user.Id) && x.ItemId == ItemId).FirstOrDefault();
+                if(model==null)
+                {
+                    return Content("Текстовая заметка не найдена или не принадлежит пользователю!");
+                }
+                context.UserNotices.Remove(model);
+                await context.SaveChangesAsync();
+                return new EmptyResult();
+            }
+            catch(Exception ex) 
+            {
+                return Content(ex.Message);
+            }
+        }
         public async Task<IActionResult> UpdateNotice([Bind] NoticeItem model)
         {
             try

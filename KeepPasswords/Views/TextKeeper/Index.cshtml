@@ -52,13 +52,13 @@
 <!-- Page body -->
 <div class="page-body">
     <div class="container-xl">
-     
-            <div class="row g-0">
-                <div class="col-12 col-md-3 border-end">
-                  
-                        <!--Sample-->
-                    <div class="card">
-                        <div class="card-header">
+
+        <div class="row g-0">
+            <div class="col-12 col-md-3 border-end">
+
+                <!--Sample-->
+                <div class="card">
+                    <div class="card-header">
                         <div class="input-icon">
                             <input type="text" id="serviceNameSearchInput" value="" class="form-control" placeholder="Поиск" onkeyup="onSearch();">
                             <span class="input-icon-addon">
@@ -66,32 +66,29 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"></path><path d="M21 21l-6 -6"></path></svg>
                             </span>
                         </div>
-                        </div>
-                    <div class="list-group list-group-flush overflow-auto" style="max-height: 37em" id="table_container">
-                      
-                        </div>
                     </div>
-                        <!--Sample-->
-               
+                    <div class="list-group list-group-flush overflow-auto" style="max-height: 37em" id="table_container">
+                    </div>
                 </div>
-                <div class="col-12 col-md-9 d-flex flex-column" id="note_body">
-                    <!--Sample-->
-               
-                    <!--Sample-->
-                </div>
+                <!--Sample-->
+
             </div>
-      
+            <div class="col-12 col-md-9 d-flex flex-column" id="note_body">
+                <!--Sample-->
+                <!--Sample-->
+            </div>
+        </div>
+
     </div>
 </div>
 
 
-<script>            
-      $(document).ready(function () {
-        onReloadNoticeTable();               
+<script>
+    $(document).ready(function () {
+        onReloadNoticeTable();
     });
 
-    function onReloadNoticeTable()
-    {
+    function onReloadNoticeTable() {
         showSpinner();
         $.get('@Url.Action("GetNoticeList", "TextKeeper")', null, function (data) {
             $('#table_container').html(data);
@@ -104,10 +101,9 @@
         $.get('@Url.Action("CreateNewNote", "TextKeeper")', null, function (data) {
             hideSpinner();
             onReloadNoticeTable();
-            if(data!=null && data!='')
-            {
+            if (data != null && data != '') {
                 onShowNotice(data);
-            }                       
+            }
         });
     }
 
@@ -117,39 +113,55 @@
         $.get('@Url.Action("ShowNote", "TextKeeper")', { ItemId: ItemId }, function (data) {
             onToggleActiveTab(ItemId);
             $('#note_body').html(data);
-            hideSpinner();             
+            hideSpinner();
         });
     }
 
-    function onToggleActiveTab(id)
-    {
+    function onShowDeleteNoticeConfirmation(ItemId){
+        $.get('@Url.Action("ShowModalDeleteNotice", "TextKeeper")', { ItemId: ItemId }, function (data) {
+            $('#modal_body').html(data);
+            globalOpenModal();
+        });
+    }
+
+
+    function onDeleteNotice(ItemId) {
+        showSpinner();
+        $.get('@Url.Action("DeleteNotice", "TextKeeper")', { ItemId: ItemId }, function (data) {
+            if (data != null && data != '') {
+                hideSpinner();
+                AlertValidate(data);
+            }
+            else {
+                hideSpinner();
+                onReloadNoticeTable();
+            }
+        });
+    }
+
+    function onToggleActiveTab(id) {
         var tabs = document.getElementsByClassName('list_tab_item');
-        for(let i=0; i < tabs.length; i++)
-        {
+        for (let i = 0; i < tabs.length; i++) {
             var tempId = tabs[i].getAttribute("data-tab-id");
-            if (tempId == id) 
-            {
+            if (tempId == id) {
                 var element = document.getElementById('tab_' + tempId);
                 element.classList.add("active");
             }
-            else
-            {
+            else {
                 var element = document.getElementById('tab_' + tempId);
-                element.classList.remove("active");               
+                element.classList.remove("active");
             }
         }
     }
 
-    function onUpdateNotice(ItemId)
-    {
+    function onUpdateNotice(ItemId) {
         showSpinner();
         var ValidField = true;
         var model = {};
         var NoticeText = tinymce.activeEditor.getContent();
         var NoticeTitle = document.getElementById('notice_title').value;
 
-        if (NoticeTitle == '' || ValidField == null) 
-        {
+        if (NoticeTitle == '' || ValidField == null) {
             ValidField = false;
             hideSpinner();
             AlertValidate('Заголовок не может быть пустым!');
@@ -158,8 +170,7 @@
         model["Title"] = NoticeTitle;
         model["Text"] = NoticeText;
 
-        if (ValidField)
-        {
+        if (ValidField) {
             $.ajax({
                 type: "POST",
                 url: '@Url.Action("UpdateNotice","TextKeeper")',
@@ -169,13 +180,12 @@
                         hideSpinner();
                         AlertValidate(data);
                     }
-                    else
-                    {
+                    else {
                         hideSpinner();
-                        onReloadNoticeTable();                          
-                    }                    
-                    @*onToggleActiveTab(ItemId);*@
-                },
+                        onReloadNoticeTable();
+                    }
+    @*onToggleActiveTab(ItemId);*@
+                    },
                 error: function () {
                     hideSpinner();
                     AlertValidate(xhr.respomseText);
@@ -183,5 +193,4 @@
             });
         }
     }
-    </script>
-   
+</script>
