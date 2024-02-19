@@ -294,15 +294,9 @@
    
     function onCreateEvent(date)
     {
-        $.get('@Url.Action("CreateNewEvent", "CalendarKeeper")', { currentDate: date }, function (data) {
-            if(data!=null && data!='')
-            {
-                AlertValidate(data);
-            }
-            else
-            {
-                onDefaultCalendarClick(date);
-            }
+        $.get('@Url.Action("ShowModalCreateEvent", "CalendarKeeper")', { currentDate: date }, function (data) {
+            $('#modal_body').html(data);
+            globalOpenModal();
             
         });
     }

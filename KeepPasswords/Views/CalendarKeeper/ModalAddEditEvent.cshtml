@@ -1,0 +1,99 @@
+﻿@model KeepPasswords.Models.Calendar.CalendarItem
+<link href="~/css/dist/libs/melloware/coloris/dist/coloris.min.css" rel="stylesheet" />
+<input type="hidden" value="@Model.ItemId" id="ItemId" />
+@{
+    DateTime minDate = new DateTime(Model.Date.Year, Model.Date.Month, Model.Date.Day);
+}
+<div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            @if (Model.ItemId == 0)
+            {
+                <h5 class="modal-title">Новое событие на дату @Model.Date.ToString("dd.MM.yyyy")</h5>
+            }
+            else
+            {
+                <h5 class="modal-title">Редактирование события</h5>
+            }
+            <button type="button" class="btn-close" onclick="onDefaultCalendarClick('@Model.Date');" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="mb-3">
+                        <label class="form-label required">Событие</label>
+                        <input type="text" class="form-control" value="@Model.EventName" name="example-text-input" placeholder="новое событие" id="ServiceName">
+                    </div>
+                </div>
+               
+            </div>
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="mb-3">
+                        <label class="form-label">Описание</label>
+                        <input type="text" value="@Model.Description" class="form-control" id="UserName" placeholder="...">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="mb-3">
+                        <label class="form-label required">Время</label>
+                        <div class="input-group input-group-flat">
+                            <input style="padding-left: 10px !important;" min="@(Model.ItemId == 0 ? $"{minDate.ToString("yyyy-MM-dd'T'HH:mm")}" : "")" type="datetime-local" value="@Model.Date.ToString("yyyy-MM-dd'T'HH:mm")" id="WebSite" class="form-control ps-0" autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="mb-3">
+                        <label class="form-label required">Цвет</label>
+                        <div>
+                            <input type="text" class="form-control d-block" id="colorpicker-1" value="@Model.Color" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+           
+        </div>
+
+        <div class="modal-footer">
+            <a onclick="onDefaultCalendarClick('@Model.Date');" class="btn btn-link link-secondary">
+                Отмена
+            </a>
+            <a onclick="onAddUpdateEvent('@Model.ItemId');" class="btn btn-dark ms-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-device-floppy" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2" /><path d="M12 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M14 4l0 4l-6 0l0 -4" /></svg>
+                Сохранить
+            </a>
+        </div>
+    </div>
+</div>
+<script src="~/css/dist/libs/melloware/coloris/dist/umd/coloris.min.js" defer></script>
+<script>
+    $(document).ready(function () {
+        window.Coloris && (Coloris({
+            el: "#colorpicker-1",
+            selectInput: false,
+            alpha: false,
+            format: "hex",
+            swatches: [
+                "#0054a6",
+                "#45aaf2",
+                "#6574cd",
+                "#a55eea",
+                "#f66d9b",
+                "#fa4654",
+                "#fd9644",
+                "#f1c40f",
+                "#7bd235",
+                "#5eba00",
+                "#2bcbba",
+                "#17a2b8",
+            ],
+        }))
+    });
+</script>

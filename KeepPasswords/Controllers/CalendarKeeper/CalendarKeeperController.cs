@@ -48,20 +48,17 @@ namespace KeepPasswords.Controllers.CalendarKeeper
             return PartialView("ModalDateEvents", model);
         }
 
-        public async Task<IActionResult> CreateNewEvent(string currentDate)
+        public async Task<IActionResult> ShowModalCreateEvent(string currentDate)
         {
             try
-            {
-                var user = await userManager.GetUserAsync(User);
+            {               
                 CalendarItem item = new CalendarItem();
                 DateTime date = Convert.ToDateTime(currentDate);
                 item.Date = new DateTime(date.Year, date.Month, date.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
                 item.Color = "#3674ab";
-                item.EventName = "Новое событие";
-                item.UserId = user.Id;
-                context.UserCalendarEvents.Add(item);
-                await context.SaveChangesAsync();
-                return new EmptyResult();
+                item.EventName = "Новое событие";                
+                item.ItemId = 0;                
+                return PartialView("ModalAddEditEvent", item);
             }
             catch (Exception ex) 
             {
