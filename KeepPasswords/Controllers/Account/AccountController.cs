@@ -289,6 +289,7 @@ namespace KeepPasswords.Controllers.Account
                     await ChangePasswordManagerUserDataCipher(secretKey.SecretPhrase,SecretPhrase);
                     await ChangeTextManagerUserDataCipher(secretKey.SecretPhrase, SecretPhrase);
                     await ChangePhotoManagerUserDataCipher(secretKey.SecretPhrase, SecretPhrase);
+                    await ChangeCalendarEventsUserDataCipher(secretKey.SecretPhrase, SecretPhrase);
                     secretKey.SecretPhrase = SecretPhrase;
                     context.UserSecretPhrases.Update(secretKey);                    
                 }
@@ -340,6 +341,26 @@ namespace KeepPasswords.Controllers.Account
                 item.Text = encryptedText;
             }
             context.UserNotices.UpdateRange(userNotices);
+            await context.SaveChangesAsync();
+
+        }
+
+        [Authorize]
+        public async Task ChangeCalendarEventsUserDataCipher(string oldSecretKey, string newSecretKey)
+        {
+            var user = await _userManager.FindByNameAsync(User.Identity.Name);
+            var calendarEvents = context.UserCalendarEvents.Where(x => x.UserId.Equals(user.Id));
+            foreach (var item in calendarEvents)
+            {
+                string decryptedName = EncryptorDecryptor.DecryptToPlainText(oldSecretKey, item.EventName);
+                string encryptedName = EncryptorDecryptor.EncryptPlainText(newSecretKey, decryptedName);
+                item.EventName = encryptedName;
+
+                string decryptedDescription = EncryptorDecryptor.DecryptToPlainText(oldSecretKey, item.Description);
+                string encryptedDecription = EncryptorDecryptor.EncryptPlainText(newSecretKey, decryptedDescription);
+                item.Description = encryptedDecription;
+            }
+            context.UserCalendarEvents.UpdateRange(calendarEvents);
             await context.SaveChangesAsync();
 
         }
