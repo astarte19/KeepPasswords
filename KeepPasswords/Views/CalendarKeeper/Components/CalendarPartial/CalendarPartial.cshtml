@@ -1,0 +1,402 @@
+﻿@{
+    bool hasSecretPhrase = (bool)ViewBag.HasSecretPhrase;
+}
+<link rel="stylesheet" href="~/css/CalendarTask.css" />
+<link href="~/css/dist/libs/melloware/coloris/dist/coloris.min.css" rel="stylesheet" />
+<div class="calendar-wrapper">
+    <span class="loadingCalendar">
+        <div class="SpinnerTextContainer">
+            <div class="spinner-border spinner-border-sm text-secondary" role="status"></div>
+            <span>Загрузка</span>
+        </div>
+
+    </span>
+    <div class="Btn-PN">
+    </div>
+    <div id="divCal"></div>
+</div>
+
+<script src="~/css/dist/libs/melloware/coloris/dist/umd/coloris.min.js" defer></script>
+
+<script type="text/javascript">
+    var c;
+
+
+
+
+
+
+    var Cal = function (divId) {
+
+        //Store div id
+        this.divId = divId;
+
+        // Days of week, starting on Sunday
+        this.DaysOfWeek = [
+            'Вс',
+            'Пн',
+            'Вт',
+            'Ср',
+            'Чт',
+            'Пт',
+            'Сб'
+        ];
+
+        // Months, stating on January
+        this.Months = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+        // Set the current month, year
+        var d = new Date();
+        this.currMonth = d.getMonth();
+        this.currYear = d.getFullYear();
+        this.currDay = d.getDate();
+    };
+
+    Cal.prototype.getCurrentYear = function () {
+        return this.currYear;
+    }
+    Cal.prototype.getCurrentMonth = function () {
+        return this.currMonth;
+    }
+
+    // Goes to next month
+    Cal.prototype.nextMonth = function () {
+        if (this.currMonth == 11) {
+            this.currMonth = 0;
+            this.currYear = this.currYear + 1;
+        }
+        else {
+            this.currMonth = this.currMonth + 1;
+        }
+        this.showcurr();
+
+    };
+
+    // Goes to previous month
+    Cal.prototype.previousMonth = function () {
+        if (this.currMonth == 0) {
+            this.currMonth = 11;
+            this.currYear = this.currYear - 1;
+        }
+        else {
+            this.currMonth = this.currMonth - 1;
+        }
+        this.showcurr();
+    };
+
+    // Show current month
+    Cal.prototype.showcurr = function (year, mount) {
+        year ??= this.currYear;
+        mount ??= this.currMonth;
+        this.showMonth(year, mount);
+
+    };
+
+
+    Cal.prototype.AddEventBtn = function () {
+        cl = this;
+        getId('btnNext').onclick = function () {
+            cl.nextMonth();
+            UpdateCalendarData();
+        };
+        getId('btnPrev').onclick = function () {
+            cl.previousMonth();
+            UpdateCalendarData();
+        };
+        getId('currDay').onclick = function () {
+            cl.currYear = new Date().getFullYear();
+            cl.currMonth = new Date().getMonth();
+            cl.showMonth(cl.currYear, cl.currMonth);
+            UpdateCalendarData();
+        };
+    };
+
+
+
+    // Show month (year, month)
+    Cal.prototype.showMonth = function (y, m) {
+
+        var d = new Date()
+            // First day of the week in the selected month
+            , firstDayOfMonth = new Date(y, m, 1).getDay()
+            // Last day of the selected month
+            , lastDateOfMonth = new Date(y, m + 1, 0).getDate()
+            // Last day of the previous month
+            , lastDayOfLastMonth = m == 0 ? new Date(y - 1, 12, 0).getDate() : new Date(y, m, 0).getDate();
+
+
+
+
+        var html = '<div class="CalendarContainer">';
+        html += '<div class="CalendarHeader">';
+        html += '<div class="Mounth"><b>' + this.Months[m] + '</b> ' + y + '</div>';
+        html += '<div class="BtnList">';
+        html += '<div class="CurrDayBtn br-05">';
+        html += '<button id="currDay" class="br-05" type="button">Сегодня</button>';
+        html += '</div>';
+        html += '<div class="btnPrevNext br-05">';
+        html += '<button id="btnPrev" class="br-05" type="button"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 6l-6 6l6 6" /></svg></button>';
+        html += '<div class="border-r inline-flex h-6 "></div>';
+        html += '<button id="btnNext" class="br-05" type="button"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg></button> </div>';
+        html += '</div>';
+        html += '</div>';
+        html += '<table>';
+
+
+        // Write selected month and year
+        html += '<thead>';
+        // Write the header of the days of the week
+        html += '<tr  class="days">';
+        for (var i = 0; i < this.DaysOfWeek.length; i++) {
+            html += '<td>' + this.DaysOfWeek[i] + '</td>';
+        }
+        html += '</tr> </thead>';
+
+        // Write the days
+        var i = 1;
+        do {
+
+            var dow = new Date(y, m, i).getDay();
+
+            // If Sunday, start new row
+            if (dow == 0) {
+                html += '<tr>';
+            }
+            // If not Sunday but first day of the month
+            // it will write the last days from the previous month
+            else if (i == 1) {
+                html += '<tr>';
+                var k = lastDayOfLastMonth - firstDayOfMonth + 1;
+                for (var j = 0; j < firstDayOfMonth; j++) {
+                    lastmount = m;
+                    if (m == 0) {
+                        lastmount = 12;
+                    }
+                    html += '<td class="not-current maday"';
+                    if (false) {
+                        html += 'onclick="onDefaultCalendarClick(\'' + new Date(y, lastmount, k).toLocaleDateString() + '\')">';
+                    }
+                    else
+                        html += '>';
+                    html += '<div class="flex">';
+                    html += '<div class="DayNumber">' + k + '</div>';
+                    html += '<div id="TaskLst-' + lastmount + '-' + k + '" class="TaskList"> </div>'
+                    html += '</div></td>';
+                    k++;
+                }
+            }
+
+            // Write the current day in the loop
+            var chk = new Date();
+            var chkY = chk.getFullYear();
+            var chkM = chk.getMonth();
+
+            let DtForClick = new Date(y, m, i).toLocaleDateString()
+
+            if (chkY == this.currYear && chkM == this.currMonth && i == this.currDay) {
+                html += '<td class="today maday"  onclick="onDefaultCalendarClick(\'' + DtForClick + '\')"> <div class="flex">';
+                html += '<div class="DayNumber"><span style="position: relative !important;transform: none;" class="badge bg-azure text-azure-fg badge-notification badge-pill">' + i + '</span></div>';
+                html += '<div id="TaskLst-' + (m + 1) + '-' + i + '"class="TaskList"> </div>'
+                html += '</div></td>';
+            } else {
+                html += '<td class="normal maday" onclick="onDefaultCalendarClick(\'' + DtForClick + '\')"><div class="flex">';
+                html += '<div class="DayNumber">' + i + '</div>';
+                html += '<div id="TaskLst-' + (m + 1) + '-' + i + '"class="TaskList"> </div>'
+                html += '</div></td>';
+            }
+            // If Saturday, closes the row
+            if (dow == 6) {
+                html += '</div></td>';
+            }
+            // If not Saturday, but last day of the selected month
+            // it will write the next few days from the next month
+            else if (i == lastDateOfMonth) {
+                var k = 1;
+                for (dow; dow < 6; dow++) {
+                    html += '<td class="not-current maday"';
+                    if (false) {
+                        html += 'onclick="onDefaultCalendarClick(\'' + new Date(y, m + 2, k).toLocaleDateString() + '\')">';
+                    }
+                    else
+                        html += '>';
+                    html += '<div class="flex">';
+                    html += '<div class="DayNumber">' + k + '</div>';
+                    html += '<div id="TaskLst-' + (m + 2) + '-' + k + '" class="TaskList"> </div>'
+                    html += '</div></td>';
+                    k++;
+                }
+            }
+
+            i++;
+        } while (i <= lastDateOfMonth);
+
+        // Closes table
+        html += '</table> </div>';
+
+        // Write HTML to the div
+        document.getElementById(this.divId).innerHTML = html;
+
+        this.AddEventBtn();
+        //UpdateCalendarData();
+    };
+
+    $(document).ready(function () {
+        var $contextMenu = $("#contextMenu");
+        // Start calendar
+        c = new Cal("divCal");
+        let Year = c.getCurrentYear();
+        let Mounth = c.getCurrentMonth();
+        c.showcurr();
+        UpdateCalendarData();
+        // Bind next and previous button clicks
+    });
+
+    function UpdateCalendarData() {
+        let year = c.getCurrentYear();
+        let mounth = c.getCurrentMonth();
+        $('.loadingCalendar').show();
+        $.get('@Url.Action("GetCalendarData", "CalendarKeeper")', { CurrentYear: year, CurrentMounth: (mounth + 1) }, function (data) {
+            if (typeof data === 'string') {
+                data = JSON.parse(data);
+            }
+            console.log(data);
+            FilCalendarData(data);
+        });
+    }
+
+    function globalCloseModalReloadCalendar() {
+        globalCloseModal();
+        UpdateCalendarData();
+    }
+
+    function getRandomColor() {
+        var letters = '0123456789ABCDEF';
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+
+    function FilCalendarData(data) {
+        $('.TaskList').html('');
+        data.forEach((e) => {
+            let dt = new Date(e.Date);
+            let mounth = dt.getMonth();
+            let day = dt.getDate();
+            let color = e.Color;
+            color ??= getRandomColor();
+            let html = '<div class="taskElement ' + '' + '" style="background-color: ' + color + '70">';
+            html += '<span class="taskName">' + e.EventName + '</span>'
+            html += '</div>'
+            $('#TaskLst-' + (mounth + 1) + '-' + day).append(html);
+        })
+        console.log(data);
+        $('.loadingCalendar').hide();
+    }
+
+    function onCreateEvent(date) {
+        $.get('@Url.Action("ShowModalCreateEvent", "CalendarKeeper")', { currentDate: date }, function (data) {
+            $('#modal_body').html(data);
+            globalOpenModal();
+
+        });
+    }
+
+    function onUpdateEvent(ItemId) {
+        $.get('@Url.Action("ShowModalUpdateEvent", "CalendarKeeper")', { ItemId: ItemId }, function (data) {
+            $('#modal_body').html(data);
+            globalOpenModal();
+
+        });
+    }
+
+    function onDeleteEvent(ItemId, date) {
+        $.get('@Url.Action("DeleteEvent", "CalendarKeeper")', { ItemId: ItemId }, function (data) {
+            if (data != null && data != '') {
+                AlertValidate(data);
+            }
+            else {
+                onDefaultCalendarClick(date);
+            }
+
+        });
+    }
+
+
+
+
+
+
+
+    function onAddUpdateEvent(ItemId, selectedDate) {
+        //showSpinner();
+
+
+        var EventName = document.getElementById('EventName').value;
+        var Color = document.getElementById('colorisPicker').value;
+        var Date = document.getElementById('EventDate').value;
+        var Description = document.getElementById('EventDescription').value;
+
+        var model = {};
+        model["ItemId"] = ItemId;
+        model["EventName"] = EventName;
+        model["Color"] = Color;
+        model["Date"] = Date;
+        model["Description"] = Description;
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("AddUpdateEvent","CalendarKeeper")',
+            data: { model: model },
+            success: function (data) {
+                if (data != null && data != '') {
+                    //hideSpinner();
+                    alertForm(data);
+                }
+                else {
+                    //hideSpinner();
+                    onDefaultCalendarClick(selectedDate);
+                }
+
+            },
+            error: function () {
+                //hideSpinner();
+                alertForm(data);
+            }
+        });
+    }
+
+    function alertForm(text) {
+        var alert_container = document.getElementById('alert_validate_container');
+        alert_container.style.display = 'block';
+        var alert_text = document.getElementById('alert_text');
+        alert_text.innerHTML = text;
+    }
+
+    //Fix jn document.ready
+    // Get element by id
+    function getId(id) {
+        return document.getElementById(id);
+    }
+</script>
+@if (hasSecretPhrase)
+{
+    <script type="text/javascript">
+        function onDefaultCalendarClick(date) {
+            $.get('@Url.Action("ShowModalDayEvents", "CalendarKeeper")', { currentDate: date }, function (data) {
+                $('#modal_body').html(data);
+                globalOpenModal();
+            });
+
+        }
+    </script>
+}
+else
+{
+    <script type="text/javascript">
+        function onDefaultCalendarClick(date) {
+            AlertValidate('Для пользователя не установлен SecretPhrase! Необходимо добавить его в настройках!');
+        }
+    </script>
+}
+

@@ -210,7 +210,7 @@
             if (flag) 
             {                
                 var parentNode = lis[i].parentNode;                
-                parentNode.parentNode.parentNode.style.display = 'flex';
+                parentNode.parentNode.parentNode.style.display = 'block';
             } 
             else 
             {                
@@ -218,5 +218,29 @@
                 parentNode.parentNode.parentNode.style.display = 'none';
             }           
         }        
+    }
+
+    function onShowModalDeletePassword(ItemId)
+    {       
+        $.get('@Url.Action("ShowModalDeletePasswordConfirmation", "PasswordsKeeper")', { ItemId: ItemId }, function (data) {
+            $('#modal_body').html(data);
+            globalOpenModal();
+        });
+    }
+
+
+    function DeletePasswordService(ItemId)
+    {
+        $.get('@Url.Action("ModalDeletePasswordService", "PasswordsKeeper")', { ItemId: ItemId }, function (data) {
+            if(data!=null && data!='')
+            {
+                AlertValidate(data);
+            }
+            else
+            {        
+                globalCloseModal();
+                onReloadPasswordsTable();
+            }
+        });
     }
 </script>

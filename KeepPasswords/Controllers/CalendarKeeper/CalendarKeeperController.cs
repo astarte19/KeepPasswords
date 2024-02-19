@@ -164,4 +164,24 @@ namespace KeepPasswords.Controllers.CalendarKeeper
             }
         }
     }
+
+    public class CalendarPartial : ViewComponent
+    {
+        private readonly ApplicationContext applicationContext;
+        private readonly UserManager<User> _userManager;
+
+        public CalendarPartial(ApplicationContext applicationContext, UserManager<User> _userManager)
+        {
+            this.applicationContext = applicationContext;
+            this._userManager = _userManager;
+        }
+
+        public async Task<IViewComponentResult> InvokeAsync()
+        {
+            var user = await _userManager.FindByNameAsync(User.Identity.Name);
+            bool hasSecretPhrase = applicationContext.UserSecretPhrases.Where(x => x.UserId.Equals(user.Id)).Count() > 0 ? true : false;
+            ViewBag.HasSecretPhrase = hasSecretPhrase;
+            return View("~/Views/CalendarKeeper/Components/CalendarPartial/CalendarPartial.cshtml");
+        }
+    }
 }

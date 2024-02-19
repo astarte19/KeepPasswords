@@ -37,19 +37,53 @@ namespace KeepPasswords.Controllers.PasswordsKeeper
             var user = await userManager.GetUserAsync(User);
             var model = context.UserPasswordManager.Where(x => x.UserId.Equals(user.Id)).ToList();
             foreach (var item in model)
-            {
-                WebClient client = new WebClient();
-                string htmlCode = client.DownloadString(item.WebSite);
-                HtmlDocument htmlDocument = new HtmlDocument();
-                htmlDocument.LoadHtml(htmlCode);
+            {                
+                try
+                {
+                    WebClient client = new WebClient();
+                    string htmlCode = client.DownloadString(item.WebSite);
+                    HtmlDocument htmlDocument = new HtmlDocument();
+                    htmlDocument.LoadHtml(htmlCode);
 
-                item.IconURL = GetWebsiteIconUrl(htmlDocument, item.WebSite);
+                    item.IconURL = GetWebsiteIconUrl(htmlDocument, item.WebSite);
+                }
+                catch(Exception ex)
+                {
+                    item.IconURL = null;
+                }
+                
             }
 
 
             return PartialView("PasswordsTablePartial", model);
         }
 
+        public async Task<IActionResult> ShowModalDeletePasswordConfirmation(int ItemId)
+        {
+            return PartialView("ModalDeletePasswordConfirmation", ItemId);
+        }
+
+        public async Task<IActionResult> ModalDeletePasswordService(int ItemId)
+        {
+            try
+            {
+                var user = await userManager.GetUserAsync(User);
+                var model = context.UserPasswordManager.Where(x => x.ItemId == ItemId && x.UserId.Equals(user.Id)).FirstOrDefault();
+                
+                if(model == null)
+                {
+                    return Content("Сервис не найден или не принадлежить пользователю!");
+                }
+
+                context.UserPasswordManager.Remove(model);
+                await context.SaveChangesAsync();
+                return new EmptyResult();
+            }
+            catch (Exception ex)
+            {
+                return Content(ex.Message);
+            }
+        }
         public async Task<IActionResult> ShowModalCreateNewPassword()
         {
             PasswordItem model = new PasswordItem();
