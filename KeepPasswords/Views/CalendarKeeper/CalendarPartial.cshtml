@@ -260,8 +260,7 @@
         });
     }
 
-    function globalCloseModalReloadCalendar()
-    {
+    function globalCloseModalReloadCalendar() {
         globalCloseModal();
         UpdateCalendarData();
     }
@@ -274,34 +273,41 @@
         }
         return color;
     }
-    
-    function FilCalendarData(data){
+
+    function FilCalendarData(data) {
         $('.TaskList').html('');
         data.forEach((e) => {
             let dt = new Date(e.Date);
             let mounth = dt.getMonth();
-            let day = dt.getDate();          
+            let day = dt.getDate();
             let color = e.Color;
-            color ??= getRandomColor();                        
+            color ??= getRandomColor();
             let html = '<div class="taskElement ' + '' + '" style="background-color: ' + color + '70">';
             html += '<span class="taskName">' + e.EventName + '</span>'
-            html +='</div>'
-            $('#TaskLst-' + (mounth+1) + '-' + day).append(html);
+            html += '</div>'
+            $('#TaskLst-' + (mounth + 1) + '-' + day).append(html);
         })
         console.log(data);
         $('.loadingCalendar').hide();
     }
-   
-    function onCreateEvent(date)
-    {
+
+    function onCreateEvent(date) {
         $.get('@Url.Action("ShowModalCreateEvent", "CalendarKeeper")', { currentDate: date }, function (data) {
             $('#modal_body').html(data);
             globalOpenModal();
-            
+
         });
     }
 
-    function onDeleteEvent(ItemId,date) {
+    function onUpdateEvent(ItemId) {
+        $.get('@Url.Action("ShowModalUpdateEvent", "CalendarKeeper")', { ItemId: ItemId }, function (data) {
+            $('#modal_body').html(data);
+            globalOpenModal();
+
+        });
+    }
+
+    function onDeleteEvent(ItemId, date) {
         $.get('@Url.Action("DeleteEvent", "CalendarKeeper")', { ItemId: ItemId }, function (data) {
             if (data != null && data != '') {
                 AlertValidate(data);
@@ -313,7 +319,7 @@
         });
     }
 
-   
+
 
     function onDefaultCalendarClick(date) {
         $.get('@Url.Action("ShowModalDayEvents", "CalendarKeeper")', { currentDate: date }, function (data) {
@@ -321,6 +327,56 @@
             globalOpenModal();
         });
     }
+
+
+
+    function onAddUpdateEvent(ItemId, selectedDate) {
+        //showSpinner();
+
+
+        var EventName = document.getElementById('EventName').value;
+        var Color = document.getElementById('colorisPicker').value;
+        var Date = document.getElementById('EventDate').value;
+        var Description = document.getElementById('EventDescription').value;
+
+        var model = {};
+        model["ItemId"] = ItemId;
+        model["EventName"] = EventName;
+        model["Color"] = Color;
+        model["Date"] = Date;
+        model["Description"] = Description;
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("AddUpdateEvent","CalendarKeeper")',
+            data: { model: model },
+            success: function (data) {
+                if (data != null && data != '') 
+                {
+                    //hideSpinner();
+                    alertForm(data);
+                }
+                else 
+                {
+                    //hideSpinner();
+                    onDefaultCalendarClick(selectedDate);
+                }
+
+            },
+            error: function () {
+                //hideSpinner();
+                alertForm(data);
+            }
+        });
+    }
+
+    function alertForm(text) {
+        var alert_container = document.getElementById('alert_validate_container');
+        alert_container.style.display = 'block';
+        var alert_text = document.getElementById('alert_text');
+        alert_text.innerHTML = text;
+    }
+
     //Fix jn document.ready
     // Get element by id
     function getId(id) {
