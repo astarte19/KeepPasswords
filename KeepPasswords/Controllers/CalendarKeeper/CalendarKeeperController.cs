@@ -35,7 +35,13 @@ namespace KeepPasswords.Controllers.CalendarKeeper
             var DateStart = DateTime.Parse($"{CurrentYear}.{CurrentMounth}.01");
             var DateEnd = DateStart.AddMonths(1).AddDays(5);
             var user = await userManager.GetUserAsync(User);
+            string key = context.UserSecretPhrases.Where(x => x.UserId.Equals(user.Id)).FirstOrDefault().SecretPhrase;
             var lst = context.UserCalendarEvents.Where(x => x.UserId.Equals(user.Id) && x.Date >= DateStart.AddDays(-5) && x.Date <= DateEnd).ToList();
+            foreach(var item in lst)
+            {
+                item.EventNameDecrypted = EncryptorDecryptor.DecryptToPlainText(key,item.EventName);
+                item.DescriptionDecrypted = item.Description == null ? "" : EncryptorDecryptor.DecryptToPlainText(key, item.Description);
+            }
             var serialize = JsonConvert.SerializeObject(lst, new JsonSerializerSettings() { MaxDepth = Int32.MaxValue, ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
             return new JsonResult(serialize);
         }
@@ -45,6 +51,12 @@ namespace KeepPasswords.Controllers.CalendarKeeper
             var user = await userManager.GetUserAsync(User);
             DateTime date = Convert.ToDateTime(currentDate);
             List<CalendarItem> model = context.UserCalendarEvents.Where(x => x.UserId.Equals(user.Id) && x.Date.Date == date.Date).ToList();
+            string key = context.UserSecretPhrases.Where(x => x.UserId.Equals(user.Id)).FirstOrDefault().SecretPhrase;
+            foreach (var item in model)
+            {
+                item.EventNameDecrypted = EncryptorDecryptor.DecryptToPlainText(key, item.EventName);
+                item.DescriptionDecrypted = item.Description == null ? "" : EncryptorDecryptor.DecryptToPlainText(key, item.Description);
+            }
             ViewBag.Date = date.ToString("dd.MM.yyyy");
             return PartialView("ModalDateEvents", model);
         }
@@ -79,6 +91,10 @@ namespace KeepPasswords.Controllers.CalendarKeeper
                     return new EmptyResult();
                 }
 
+                string key = context.UserSecretPhrases.Where(x => x.UserId.Equals(user.Id)).FirstOrDefault().SecretPhrase;
+                model.DescriptionDecrypted = model.Description == null ? "" : EncryptorDecryptor.DecryptToPlainText(key, model.Description);
+                model.EventNameDecrypted = EncryptorDecryptor.DecryptToPlainText(key, model.EventName);
+
                 return PartialView("ModalAddEditEvent", model);
             }
             catch (Exception ex)
@@ -92,7 +108,14 @@ namespace KeepPasswords.Controllers.CalendarKeeper
             try
             {
                 var user = await userManager.GetUserAsync(User);
-                if(model.ItemId == 0)
+                string key = context.UserSecretPhrases.Where(x => x.UserId.Equals(user.Id)).FirstOrDefault().SecretPhrase;
+
+                if(String.IsNullOrEmpty(key))
+                {
+                    return Content("Для пользователя не установлен SecretPhrase! Необходимо добавить его в настройках!");
+                }
+
+                if (model.ItemId == 0)
                 {
                     if(String.IsNullOrEmpty(model.EventName))
                     {
@@ -105,6 +128,9 @@ namespace KeepPasswords.Controllers.CalendarKeeper
                     }
 
                     model.UserId = user.Id;
+                    model.EventName = EncryptorDecryptor.EncryptPlainText(key, model.EventName);
+                    model.Description = EncryptorDecryptor.EncryptPlainText(key, model.Description);
+                    
                     await context.UserCalendarEvents.AddAsync(model);               
                 }
                 else
@@ -126,10 +152,10 @@ namespace KeepPasswords.Controllers.CalendarKeeper
                         return Content("Цвет события обязателен к выбору!");
                     }
 
-                    existedEvent.EventName = model.EventName;
+                    existedEvent.EventName = EncryptorDecryptor.EncryptPlainText(key, model.EventName); ;
                     existedEvent.Color = model.Color;
                     existedEvent.Date = model.Date;
-                    existedEvent.Description = model.Description;
+                    existedEvent.Description = EncryptorDecryptor.EncryptPlainText(key, model.Description == null ? "" : model.Description);
                     context.UserCalendarEvents.Update(existedEvent);
                     
                     

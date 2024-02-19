@@ -22,8 +22,8 @@
                                     <span class="badge bg-purple text-purple-fg" style="background-color: @item.Color !important;">@item.Date.ToString("HH:mm")</span>                                   
                                 </div>
                                 <div class="col text-truncate">
-                                    <div class=" text-reset">@item.EventName</div>
-                                    <div class="text-secondary text-truncate mt-n1">@item.Description</div>
+                                    <div class=" text-reset">@item.EventNameDecrypted</div>
+                                    <div class="text-secondary text-truncate mt-n1">@item.DescriptionDecrypted</div>
                                 </div>
                                 <div class="col-auto">
                                     <a style="cursor: pointer;" onclick="onUpdateEvent('@item.ItemId')" class="list-group-item-actions">

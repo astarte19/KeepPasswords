@@ -286,7 +286,7 @@
             let color = e.Color;
             color ??= getRandomColor();
             let html = '<div class="taskElement ' + '' + '" style="background-color: ' + color + '70">';
-            html += '<span class="taskName">' + e.EventName + '</span>'
+            html += '<span class="taskName">' + e.EventNameDecrypted + '</span>'
             html += '</div>'
             $('#TaskLst-' + (mounth + 1) + '-' + day).append(html);
         })

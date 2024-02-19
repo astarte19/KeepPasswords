@@ -13,6 +13,9 @@ namespace KeepPasswords.Models.Calendar
         public DateTime Date { get; set; }
         public string Color { get; set; }
         public string? Description { get; set; }
-
+        [NotMapped]
+        public string EventNameDecrypted { get; set; }
+        [NotMapped]
+        public string DescriptionDecrypted { get; set; }
     }
 }
