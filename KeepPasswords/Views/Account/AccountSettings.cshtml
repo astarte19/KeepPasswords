@@ -8,9 +8,9 @@
                     <h4 class="subheader">Настройки учетной записи</h4>
                     <div class="list-group list-group-transparent">
                         <a asp-controller="Account" asp-action="AccountSettings" class="list-group-item list-group-item-action d-flex align-items-center active">Учетная запись</a>
-                       
+
                     </div>
-                  
+
                 </div>
             </div>
             <div class="col-12 col-md-9 d-flex flex-column">
@@ -19,7 +19,7 @@
                     <h3 class="card-title">Профиль</h3>
                     <div class="row align-items-center">
                         <div class="col-auto">
-                            @if (ViewBag.Avatar!=null)
+                            @if (ViewBag.Avatar != null)
                             {
                                 <span id="avatar_container" class="avatar avatar-xl" style="background-image: url(data:image/jpeg;base64,@(Convert.ToBase64String(ViewBag.Avatar)))"></span>
                             }
@@ -59,7 +59,7 @@
                     <h3 class="card-title mt-4">SecretPhrase</h3>
                     <p class="card-subtitle">Ключ, используемый для шифрования ваших данных.</p>
                     <div>
-                        @if (ViewBag.SecretKey==null)
+                        @if (ViewBag.SecretKey == null)
                         {
                             <div class="row g-2">
                                 <div class="col-auto">
@@ -95,7 +95,7 @@
                                 </div>
                             </div>
                         }
-                       
+
                     </div>
                     <h3 class="card-title mt-4">Пароль</h3>
                     <p class="card-subtitle">Не менее 5 символов.</p>
@@ -134,7 +134,7 @@
         if (UserName == null || UserName == '' || UserName.length < 5) {
             ValidFields = false;
             hideSpinner();
-            AlertValidate('Имя пользователя должно иметь более 5 символов!');
+            AlertValidate('Имя пользователя должно иметь не менее 5 символов!');
         }
         var Location = document.getElementById('LocationForm').value;
         var Email = document.getElementById('Email').value;
@@ -166,6 +166,21 @@
         }
 
         if (ValidFields) {
+            var fileform = document.getElementById('avatart_fileForm');
+            var file = fileform.files[0];
+
+            if (file != null && file != '') 
+            {
+                var fileSizeInMB = file.size / 1024 / 1024;
+                if (fileSizeInMB > 5) {
+                    ValidFields = false;
+                    AlertValidate('Максимальный размер аватара пользователя 5MB! Размер выбранного аватара: ' + String(fileSizeInMB).substr(0, 3) + 'MB.');
+                }
+            }
+
+        }
+
+        if (ValidFields) {
             var model = {};
             model["UserName"] = UserName;
             model["Email"] = Email;
@@ -178,15 +193,15 @@
                 $.ajax({
                     type: "POST",
                     url: '@Url.Action("UploadAvatar","Account")',
-                    contentType:false,
-                    processData:false,
+                    contentType: false,
+                    processData: false,
                     data: data,
                     success: function (data) {
                         if (data != null && data != '') {
                             hideSpinner();
                             AlertValidate(data);
                         }
-                        
+
                     },
                     error: function () {
                         hideSpinner();
@@ -197,11 +212,10 @@
 
             $.ajax({
                 type: "POST",
-                url: '@Url.Action("SaveAccountChanges","Account")',               
+                url: '@Url.Action("SaveAccountChanges","Account")',
                 data: { profile: model },
                 success: function (data) {
-                    if (data != null && data != '')
-                    {
+                    if (data != null && data != '') {
                         hideSpinner();
                         AlertValidate(data);
                     }
@@ -216,8 +230,7 @@
         }
     }
 
-    function ResetAvatarConfirmation()
-    {
+    function ResetAvatarConfirmation() {
         $.get('@Url.Action("ShowModalResetAvatarConfirmation", "Account")', null, function (data) {
             $('#modal_body').html(data);
             globalOpenModal();
@@ -225,16 +238,15 @@
     }
     function ResetAvatar() {
         $.get('@Url.Action("ResetAvatar", "Account")', null, function (data) {
-            if(data!=null && data!='')
-            {
+            if (data != null && data != '') {
                 AlertValidate(data);
             }
-            else{
+            else {
                 globalCloseModal();
                 window.location.href = '@Url.Action("AccountSettings", "Account")';
             }
-            
-           
+
+
         });
     }
 
@@ -245,45 +257,39 @@
         });
     }
 
-    function onChangeUserPassword()
-    {
+    function onChangeUserPassword() {
         var ValidField = true;
         var Password = document.getElementById('password').value;
         var PasswordConfirmation = document.getElementById('password_confirmation').value;
 
-        if (Password == null || Password == '') 
-        {
+        if (Password == null || Password == '') {
             ValidField = false;
             AlertValidate('Новый пароль не должен быть пустым!');
         }
 
-        if (ValidField)
-        {
+        if (ValidField) {
             if (PasswordConfirmation == null || PasswordConfirmation == '') {
                 ValidField = false;
                 AlertValidate('Подтверждение пароля не долженл быть пустым!');
             }
         }
 
-        if (ValidField)
-        {
+        if (ValidField) {
             if (Password.length < 5) {
                 ValidField = false;
                 AlertValidate('Минимальная длина пароля 5 символов!');
             }
         }
 
-        if (ValidField)
-        {
+        if (ValidField) {
             if (Password != PasswordConfirmation) {
                 ValidField = false;
                 AlertValidate('Пароль и подтверждение пароля не совпадают!');
             }
         }
-        
 
-        if (ValidField)
-        {
+
+        if (ValidField) {
             $.get('@Url.Action("ChangeUserPassword", "Account")', { Password: Password }, function (data) {
                 if (data != null && data != '') {
                     AlertValidate(data);
@@ -294,10 +300,10 @@
 
 
             });
-        }         
+        }
     }
-    
-    
+
+
 
     function ShowModalSecretKey() {
         $.get('@Url.Action("ShowModalSecretKey", "Account")', null, function (data) {

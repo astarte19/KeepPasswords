@@ -8,6 +8,8 @@ using System.Security.Policy;
 using KeepPasswords.Models;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Security.Claims;
 
 namespace KeepPasswords.Controllers.Account
 {
@@ -15,8 +17,7 @@ namespace KeepPasswords.Controllers.Account
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
-        private readonly ApplicationContext context;
-
+        private readonly ApplicationContext context;        
         public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, ApplicationContext context)
         {
             _userManager = userManager;
@@ -32,8 +33,33 @@ namespace KeepPasswords.Controllers.Account
 
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
+            if (model.Username.Length < 5)
+            {
+                ModelState.AddModelError(string.Empty, "Имя пользователя должно быть не менее 5 символов!");
+                return View(model);
+            }
+
+            if(!ValidateEmail(model.Email))
+            {
+                ModelState.AddModelError(string.Empty, "Email введен некорректно!");
+                return View(model);
+            }
+
+            if (model.Password.Length < 4)
+            {
+                ModelState.AddModelError(string.Empty, "Минимальная длина пароля 4 символа!");
+                return View(model);
+            }
+
+            if (!model.Password.Equals(model.PasswordConfirm))
+            {
+                ModelState.AddModelError(string.Empty, "Пароль и подтверждение пароля не совпадают!");
+                return View(model);
+            }
+
             if (ModelState.IsValid)
             {
                 User user = new User { Email = model.Email, UserName = model.Username };
@@ -56,6 +82,24 @@ namespace KeepPasswords.Controllers.Account
             }
 
             return View(model);
+        }
+
+        public static bool ValidateEmail(string email)
+        {
+            try
+            {
+                // Регулярное выражение для валидации email
+                string pattern = @"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$";
+
+                // Проверка вводимого email на соответствие регулярному выражению
+                Match match = Regex.Match(email, pattern);
+
+                return match.Success;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         [HttpGet]
@@ -145,14 +189,17 @@ namespace KeepPasswords.Controllers.Account
         {
             try
             {
-                var user = await _userManager.GetUserAsync(User);                
-                user.UserName = profile.UserName;
+                var user = await _userManager.GetUserAsync(User);   
+
+                if(!user.UserName.Equals(profile.UserName))
+                {
+                    await _userManager.SetUserNameAsync(user, profile.UserName);
+                }               
+
                 user.Email = profile.Email;
                 user.Location = profile.Location;
                 await _userManager.UpdateAsync(user);
-
-                
-
+                await _signInManager.SignInAsync(user, true);
                 return new EmptyResult();
             }
             catch (Exception ex)

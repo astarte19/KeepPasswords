@@ -45,12 +45,12 @@
           <div class="card-body">
             <h2 class="h2 text-center mb-4">Вход в учетную запись</h2>
                     <form method="post" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Model.ReturnUrl">
-                        <div asp-validation-summary="ModelOnly"></div>
+                        <div asp-validation-summary="ModelOnly" style="color: red;"></div>
               <div class="mb-3">
                 <label class="form-label">Имя пользователя</label>
                 
                             <span asp-validation-for="Email" />
-                            <input type="text" class="form-control" placeholder="username" asp-for="Email">
+                            <input type="text" class="form-control" placeholder="..." asp-for="Email">
               </div>
               <div class="mb-2">
                 <label class="form-label">
