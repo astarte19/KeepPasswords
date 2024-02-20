@@ -44,7 +44,7 @@ namespace KeepPasswords.Controllers.Account
 
                     await _signInManager.SignInAsync(user, false);
 
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "CalendarKeeper");
                 }
                 else
                 {
@@ -69,7 +69,7 @@ namespace KeepPasswords.Controllers.Account
                 }
                 else
                 {
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "CalendarKeeper");
                 }
             }
             return View(new LoginViewModel { ReturnUrl = returnUrl });
@@ -95,12 +95,12 @@ namespace KeepPasswords.Controllers.Account
                     }
                     else
                     {
-                        return RedirectToAction("Index", "Home");
+                        return RedirectToAction("Index", "CalendarKeeper");
                     }
                 }
                 else
                 {
-                    ModelState.AddModelError("", "Wrong data");
+                    ModelState.AddModelError("", "Некорректные данные");
                 }
             }
             return View(model);
@@ -112,7 +112,7 @@ namespace KeepPasswords.Controllers.Account
         {
             // удаляем аутентификационные куки
             await _signInManager.SignOutAsync();
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "CalendarKeeper");
         }
 
         [Authorize]
