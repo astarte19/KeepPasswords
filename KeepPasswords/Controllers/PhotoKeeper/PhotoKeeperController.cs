@@ -41,13 +41,18 @@ namespace KeepPasswords.Controllers.PhotoKeeper
         public async Task<IActionResult> GetPhotos()
         {
             var user = await userManager.GetUserAsync(User);
-            string key = context.UserSecretPhrases.Where(x => x.UserId.Equals(user.Id)).FirstOrDefault().SecretPhrase;
+            var secretPhrase = context.UserSecretPhrases.Where(x => x.UserId.Equals(user.Id)).FirstOrDefault();
             var model = context.UserPhotos.Where(x => x.UserId.Equals(user.Id)).ToList();
-            foreach(var item in model)
+            if (secretPhrase != null)
             {
-                UTF8Encoding utf8 = new UTF8Encoding();
-                item.DecryptedPhotoBytes = EncryptorDecryptor.DecryptBytes(item.PhotoBytes, utf8.GetBytes(key));
+                string key = secretPhrase.SecretPhrase;
+                foreach (var item in model)
+                {
+                    UTF8Encoding utf8 = new UTF8Encoding();
+                    item.DecryptedPhotoBytes = EncryptorDecryptor.DecryptBytes(item.PhotoBytes, utf8.GetBytes(key));
+                }
             }
+                                   
             return PartialView("PhotoGridPartial", model);
         }
         public async Task<IActionResult> ShowModalSuccess(string message)

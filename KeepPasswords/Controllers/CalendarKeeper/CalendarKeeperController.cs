@@ -35,13 +35,21 @@ namespace KeepPasswords.Controllers.CalendarKeeper
             var DateStart = DateTime.Parse($"{CurrentYear}.{CurrentMounth}.01");
             var DateEnd = DateStart.AddMonths(1).AddDays(5);
             var user = await userManager.GetUserAsync(User);
-            string key = context.UserSecretPhrases.Where(x => x.UserId.Equals(user.Id)).FirstOrDefault().SecretPhrase;
+            var secretPhrase = context.UserSecretPhrases.Where(x => x.UserId.Equals(user.Id)).FirstOrDefault();
             var lst = context.UserCalendarEvents.Where(x => x.UserId.Equals(user.Id) && x.Date >= DateStart.AddDays(-5) && x.Date <= DateEnd).ToList();
-            foreach(var item in lst)
+
+            if (secretPhrase != null)
             {
-                item.EventNameDecrypted = EncryptorDecryptor.DecryptToPlainText(key,item.EventName);
-                item.DescriptionDecrypted = item.Description == null ? "" : EncryptorDecryptor.DecryptToPlainText(key, item.Description);
+                string key = secretPhrase.SecretPhrase;
+
+                foreach (var item in lst)
+                {
+                    item.EventNameDecrypted = EncryptorDecryptor.DecryptToPlainText(key, item.EventName);
+                    item.DescriptionDecrypted = item.Description == null ? "" : EncryptorDecryptor.DecryptToPlainText(key, item.Description);
+                }
             }
+
+            
             var serialize = JsonConvert.SerializeObject(lst, new JsonSerializerSettings() { MaxDepth = Int32.MaxValue, ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
             return new JsonResult(serialize);
         }

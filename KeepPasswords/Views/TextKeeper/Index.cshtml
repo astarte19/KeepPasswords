@@ -14,11 +14,9 @@
             </div>
             <!-- Page title actions -->
             <div class="col-auto ms-auto d-print-none">
-                @if ((bool)ViewBag.HasSecretPhrase)
-                {
                     <div class="btn-list">
 
-                        <a class="btn btn-dark d-none d-sm-inline-block" onclick="onCreateNewNote()">
+                        <a class="btn btn-dark d-none d-sm-inline-block" onclick="@((bool)ViewBag.HasSecretPhrase ? "onCreateNewNote()" : "AlertValidate('Для пользователя не установлен SecretPhrase! Необходимо добавить его в настройках!');")">
                             <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
                             Новая запись
@@ -27,24 +25,7 @@
                             <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
                         </a>
-                    </div>
-                }
-                else
-                {
-                    <div class="btn-list" style="cursor: pointer !important;" title="Для пользователя не установлен SecretPhrase! Необходимо добавить его в настройках!">
-
-                        <a class="btn btn-dark d-none d-sm-inline-block disabled">
-                            <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
-                            Новая запись
-                        </a>
-                        <a class="btn btn-dark d-sm-none btn-icon disabled">
-                            <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
-                        </a>
-                    </div>
-                }
-
+                    </div>               
             </div>
         </div>
     </div>
