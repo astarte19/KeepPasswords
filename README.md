@@ -11,7 +11,7 @@ C#
 .NET Core
 ASP.NET Core MVC
 Entity Framework Core
-SQLite/SQLServer
+SQLServer
 ASP.NET Core Identity
 
 Front-end:
