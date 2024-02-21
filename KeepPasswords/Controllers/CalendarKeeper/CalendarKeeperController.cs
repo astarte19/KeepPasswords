@@ -150,7 +150,7 @@ namespace KeepPasswords.Controllers.CalendarKeeper
 
                     model.UserId = user.Id;
                     model.EventName = EncryptorDecryptor.EncryptPlainText(key, model.EventName);
-                    model.Description = EncryptorDecryptor.EncryptPlainText(key, model.Description);
+                    model.Description = model.Description != null ? EncryptorDecryptor.EncryptPlainText(key, model.Description): null;
                     
                     await context.UserCalendarEvents.AddAsync(model);               
                 }
