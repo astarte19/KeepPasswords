@@ -59,7 +59,7 @@ namespace KeepPasswords.Controllers.CalendarKeeper
         public async Task<IActionResult> ShowModalDayEvents(string currentDate)
         {
             var user = await userManager.GetUserAsync(User);
-            DateTime date = DateTime.ParseExact(currentDate, "dd.MM.yyyy", CultureInfo.InvariantCulture); ;
+            DateTime date = DateTime.ParseExact(currentDate, "dd.MM.yyyy", CultureInfo.InvariantCulture);
             List<CalendarItem> model = context.UserCalendarEvents.Where(x => x.UserId.Equals(user.Id) && x.Date.Date == date.Date).ToList();
             
             var secretPhrase = context.UserSecretPhrases.Where(x => x.UserId.Equals(user.Id)).FirstOrDefault();
@@ -87,7 +87,7 @@ namespace KeepPasswords.Controllers.CalendarKeeper
             try
             {
                 CalendarItem item = new CalendarItem();
-                DateTime date = Convert.ToDateTime(currentDate);
+                DateTime date = DateTime.ParseExact(currentDate, "dd.MM.yyyy", CultureInfo.InvariantCulture);
                 item.Date = new DateTime(date.Year, date.Month, date.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
                 item.Color = "#3674ab";
                 item.EventName = "";
