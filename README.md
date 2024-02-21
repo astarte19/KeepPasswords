@@ -6,21 +6,21 @@
 4. Календарь событий - планировщик расписания с возмодностью управления записями по датам
 
 ## Технологии
-Back-end:
-C#
-.NET Core
-ASP.NET Core MVC
-Entity Framework Core
-SQLServer
-ASP.NET Core Identity
+**Back-end:**
+- C#
+- .NET Core
+- ASP.NET Core MVC
+- Entity Framework Core
+- SQLServer
+- ASP.NET Core Identity
 
-Front-end:
-JS
-HTML
-CSS
-Bootstrap
-Ajax
-Jquery
+**Front-end:**
+- JS
+- HTML
+- CSS
+- Bootstrap
+- Ajax
+- Jquery
 
 ## Развертывание
 Приложение развернуто на удаленном сервере в docker-контейнере с реурсами RAM: 250MB | CPU: 0.25 vCPU
