@@ -4,10 +4,12 @@ using KeepPasswords.Models.Account;
 using KeepPasswords.Models.Calendar;
 using KeepPasswords.Models.TextKeeper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Newtonsoft.Json;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
@@ -57,14 +59,25 @@ namespace KeepPasswords.Controllers.CalendarKeeper
         public async Task<IActionResult> ShowModalDayEvents(string currentDate)
         {
             var user = await userManager.GetUserAsync(User);
-            DateTime date = Convert.ToDateTime(currentDate);
+            DateTime date = DateTime.ParseExact(currentDate, "dd.MM.yyyy", CultureInfo.InvariantCulture); ;
             List<CalendarItem> model = context.UserCalendarEvents.Where(x => x.UserId.Equals(user.Id) && x.Date.Date == date.Date).ToList();
-            string key = context.UserSecretPhrases.Where(x => x.UserId.Equals(user.Id)).FirstOrDefault().SecretPhrase;
-            foreach (var item in model)
+            
+            var secretPhrase = context.UserSecretPhrases.Where(x => x.UserId.Equals(user.Id)).FirstOrDefault();
+            if(secretPhrase != null)
             {
-                item.EventNameDecrypted = EncryptorDecryptor.DecryptToPlainText(key, item.EventName);
-                item.DescriptionDecrypted = item.Description == null ? "" : EncryptorDecryptor.DecryptToPlainText(key, item.Description);
+                string key = secretPhrase.SecretPhrase;
+                foreach (var item in model)
+                {
+                    item.EventNameDecrypted = EncryptorDecryptor.DecryptToPlainText(key, item.EventName);
+                    item.DescriptionDecrypted = item.Description == null ? "" : EncryptorDecryptor.DecryptToPlainText(key, item.Description);
+                }
             }
+            else
+            {
+                model = new List<CalendarItem>();
+            }
+            
+            
             ViewBag.Date = date.ToString("dd.MM.yyyy");
             return PartialView("ModalDateEvents", model);
         }
