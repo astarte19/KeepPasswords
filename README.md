@@ -54,4 +54,4 @@ builder.Services.AddDbContext<ApplicationContext>(options =>
                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 ```
 ## Демо
-Приложение доступно по ссылке [a24725-6a37.u.d-f.pw](https://a24725-6a37.u.d-f.pw)
+Приложение доступно по ссылке [a24727-cfd0.u.d-f.pw](https://a24727-cfd0.u.d-f.pw)
