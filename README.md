@@ -33,7 +33,8 @@
 1. Приложение(с SQLServer) развернуто на удаленном сервере в docker-контейнере с реурсами RAM: 250MB | CPU: 0.25 vCPU
 2. Приложение(с SQLite) можно запустить, заменив параметры в файлах
 - В файле appsettings.json значение параметра DefaultConnection
-`{
+```json
+{
   "ConnectionStrings": {
     "DefaultConnection": "Data Source=KeepPasswordsService.db;"
 
@@ -46,11 +47,11 @@
   },
   "AllowedHosts": "*"
 }
-`
+```
 - В файле Program.cs options.UseSqlite на options.UseSqlServer
-`
+```C#
 builder.Services.AddDbContext<ApplicationContext>(options =>
                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-`
+```
 ## Демо
 Приложение доступно по ссылке [a24725-6a37.u.d-f.pw](https://a24725-6a37.u.d-f.pw)
