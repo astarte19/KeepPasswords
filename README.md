@@ -55,3 +55,4 @@ builder.Services.AddDbContext<ApplicationContext>(options =>
 ```
 ## Демо
 Приложение доступно по ссылке [a24727-cfd0.u.d-f.pw](https://a24727-cfd0.u.d-f.pw)
+> **Примечание:** Выделенные ресурсы небольшие, поэтому приложение может работать с задержками.
