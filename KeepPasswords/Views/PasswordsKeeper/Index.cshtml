@@ -77,8 +77,7 @@
     }
 
     function onAddUpdateService()
-    {
-        showSpinner();
+    {        
         var ValidFields = true;
         var ServiceName = document.getElementById('ServiceName').value;
         var UserName = document.getElementById('UserName').value;
@@ -90,17 +89,15 @@
         var Password = document.getElementById('Password').value;
 
         if (ServiceName == null || ServiceName == '' || ServiceName.length < 3) {
-            ValidFields = false;
-            hideSpinner();
-            AlertValidate('Название сервиса должно иметь более 3 символов!');
+            ValidFields = false;           
+            AlertValidateForm('Название сервиса должно иметь более 3 символов!');
         }
 
         if (ValidFields)
         {
             if (UserName == null || UserName == '' || UserName.length < 3) {
-                ValidFields = false;
-                hideSpinner();
-                AlertValidate('Имя пользователя должно иметь более 3 символов!');
+                ValidFields = false;                
+                AlertValidateForm('Имя пользователя должно иметь более 3 символов!');
             }
         }
 
@@ -109,18 +106,16 @@
             if (Email != null && Email != '') {
                 let pattern = /^[^ ]+@@[^ ]+\.[a-z]{2,3}$/;
                 if (!Email.match(pattern)) {
-                    ValidFields = false;
-                    hideSpinner();
-                    AlertValidate('Email введен некорректно!');
+                    ValidFields = false;                    
+                    AlertValidateForm('Email введен некорректно!');
                 }                
             }           
         }
 
         if (ValidFields) {
             if (Password == null || Password == '' || Password.length < 5) {
-                ValidFields = false;
-                hideSpinner();
-                AlertValidate('Пароль должен иметь более 5 символов!');
+                ValidFields = false;                
+                AlertValidateForm('Пароль должен иметь более 5 символов!');
             }
         }
 
@@ -129,9 +124,8 @@
             var isValidURL = validURL(WebSite);
             if (!isValidURL)
             {
-                ValidFields = false;
-                hideSpinner();
-                AlertValidate('URL введена некорректно!');
+                ValidFields = false;                
+                AlertValidateForm('URL введена некорректно!');
             }
         }
 
@@ -155,16 +149,17 @@
                 url: '@Url.Action("AddUpdateService","PasswordsKeeper")',
                 data: { model: model },
                 success: function (data) {
-                    if (data != null && data != '') {
-                        hideSpinner();
-                        AlertValidate(data);
+                    if (data != null && data != '') {                        
+                        AlertValidateForm(data);
                     }
-                    hideSpinner();
-                    onReloadPasswordsTable();
+                    else
+                    {
+                        onReloadPasswordsTable();
+                    }
+                   
                 },
-                error: function () {
-                    hideSpinner();
-                    AlertValidate(xhr.respomseText);
+                error: function () {                    
+                    AlertValidateForm(xhr.respomseText);
                 }
             });
         }
@@ -222,6 +217,14 @@
                 globalCloseModal();
                 onReloadPasswordsTable();
             }
+        });
+    }
+
+    function AlertValidateForm(text)
+    {
+        $.get('@Url.Action("AlertValidateForm", "Home")', { text: text }, function (data) {
+            $('#validate_badge').html(data);
+           
         });
     }
 </script>

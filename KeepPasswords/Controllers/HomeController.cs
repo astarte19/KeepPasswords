@@ -46,6 +46,11 @@ namespace KeepPasswords.Controllers
         {
             return PartialView("ModalSpinner");
         }
+
+        public async Task<IActionResult> AlertValidateForm(string text)
+        {
+            return PartialView("ValidateErrorBadge", text);
+        }
     }
 
     public class UserAvatarComponent: ViewComponent
